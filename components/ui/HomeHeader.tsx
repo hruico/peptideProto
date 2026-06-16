@@ -9,7 +9,7 @@ export default function HomeHeader() {
       {/* Avatar / Account */}
       <TouchableOpacity
         style={styles.avatar}
-        onPress={() => router.push('/account/index' as any)}
+        onPress={() => router.push('/account/account' as any)}
         activeOpacity={0.8}
       >
         <User size={18} color={Colors.textSecondary} />

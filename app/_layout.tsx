@@ -56,7 +56,7 @@ function RootLayoutNav() {
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="peptide/[id]" options={{ presentation: 'modal' }} />
         <Stack.Screen name="protocol/[id]" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="account/index" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="account/account" options={{ presentation: 'modal' }} />
         <Stack.Screen name="account/my-protocols" options={{ presentation: 'modal' }} />
         <Stack.Screen name="account/stats" options={{ presentation: 'modal' }} />
         <Stack.Screen name="reconstitute/new-peptide" options={{ presentation: 'modal' }} />
