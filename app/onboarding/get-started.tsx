@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Target, FlaskConical, BookOpen, Layers, ChevronLeft } from 'lucide-react-native';
+import { X } from 'lucide-react-native';
 import * as Linking from 'expo-linking';
 import VerifiedExpertsCard from '../../components/cards/VerifiedExpertsCard';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
@@ -15,33 +15,29 @@ const OPTIONS = [
     id: 'match-goal',
     number: '01',
     label: 'Match my goal',
-    description: 'We\'ll find peptides based on what you want to achieve.',
-    icon: Target,
+    description: 'Tell us your outcome — we route the protocol.',
     route: '/onboarding/goal-picker',
   },
   {
     id: 'choose-peptide',
     number: '02',
     label: 'Choose a peptide',
-    description: 'I already know what I want to research.',
-    icon: FlaskConical,
+    description: 'Browse the catalog by name or mechanism.',
     route: '/onboarding/peptide-picker',
   },
   {
     id: 'browse-protocols',
     number: '03',
     label: 'Browse protocols',
-    description: 'Show me curated stacks I can start.',
-    icon: BookOpen,
-    route: null, // goes straight to tabs
+    description: 'Vetted stacks with dosing and timing.',
+    route: null,
   },
   {
     id: 'add-stack',
     number: '04',
-    label: 'Add my current stack',
-    description: 'I\'m already running a protocol — help me track it.',
-    icon: Layers,
-    route: null, // goes straight to tabs
+    label: 'Add current stack',
+    description: 'Log what you take — get a tailored plan.',
+    route: null,
   },
 ];
 
@@ -64,42 +60,42 @@ export default function GetStartedScreen() {
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-        <ChevronLeft size={24} color={Colors.textSecondary} />
+      {/* Close button */}
+      <TouchableOpacity style={styles.closeBtn} onPress={() => {
+        continueAsGuest();
+        completeOnboarding();
+        router.replace('/(tabs)');
+      }}>
+        <X size={18} color="rgba(255,255,255,0.6)" />
       </TouchableOpacity>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        <Text style={styles.step}>3 of 3</Text>
         <Text style={styles.heading}>How do you want{'\n'}to get started?</Text>
+        <Text style={styles.sub}>Choose the path that matches what you want to do next.</Text>
 
+        {/* 2x2 numbered grid */}
         <View style={styles.grid}>
-          {OPTIONS.map((opt) => {
-            const Icon = opt.icon;
-            return (
-              <TouchableOpacity
-                key={opt.id}
-                style={styles.optionCard}
-                onPress={() => handleOption(opt.id, opt.route)}
-                activeOpacity={0.8}
-              >
-                <View style={styles.optionHeader}>
-                  <Text style={styles.optionNumber}>{opt.number}</Text>
-                  <View style={styles.iconCircle}>
-                    <Icon size={18} color={Colors.accentOrange} />
-                  </View>
-                </View>
-                <Text style={styles.optionLabel}>{opt.label}</Text>
-                <Text style={styles.optionDesc}>{opt.description}</Text>
-              </TouchableOpacity>
-            );
-          })}
+          {OPTIONS.map((opt) => (
+            <TouchableOpacity
+              key={opt.id}
+              style={styles.card}
+              onPress={() => handleOption(opt.id, opt.route)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.cardNumber}>{opt.number}</Text>
+              <View style={styles.divider} />
+              <Text style={styles.cardLabel}>{opt.label}</Text>
+              <Text style={styles.cardDesc}>{opt.description}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
-        <View style={styles.expertsCard}>
-          <VerifiedExpertsCard
-            onPressAskExpert={() => Linking.openURL(DISCORD_URL)}
-          />
-        </View>
+        {/* OR TALK IT THROUGH */}
+        <Text style={styles.orLabel}>OR TALK IT THROUGH</Text>
+
+        <VerifiedExpertsCard
+          onPressAskExpert={() => Linking.openURL(DISCORD_URL)}
+        />
       </ScrollView>
     </View>
   );
@@ -107,22 +103,35 @@ export default function GetStartedScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.base },
-  back: { paddingTop: 56, paddingHorizontal: Spacing.md },
-  scroll: { paddingHorizontal: Spacing.lg, paddingBottom: 48 },
-  step: {
-    color: Colors.accentOrange,
-    fontSize: Typography.sm,
-    fontWeight: FontWeight.semibold,
-    letterSpacing: 1,
-    marginBottom: Spacing.sm,
-    marginTop: Spacing.lg,
+  closeBtn: {
+    position: 'absolute',
+    top: 52,
+    right: Spacing.lg,
+    zIndex: 10,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scroll: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: 80,
+    paddingBottom: 48,
   },
   heading: {
-    color: Colors.textPrimary,
-    fontSize: Typography.xl,
+    color: '#FFFFFF',
+    fontSize: Typography.xxl,
     fontWeight: FontWeight.extrabold,
+    lineHeight: 36,
+    marginBottom: Spacing.sm,
+  },
+  sub: {
+    color: 'rgba(255,255,255,0.45)',
+    fontSize: Typography.sm,
+    lineHeight: 20,
     marginBottom: Spacing.xl,
-    lineHeight: 32,
   },
   grid: {
     flexDirection: 'row',
@@ -130,43 +139,43 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
     marginBottom: Spacing.xl,
   },
-  optionCard: {
+  card: {
     width: '47%',
     backgroundColor: Colors.surfaceElevated,
     borderRadius: Radii.xl,
     padding: Spacing.md,
     borderWidth: 1,
     borderColor: Colors.surfaceBorder,
-    gap: Spacing.xs,
+    minHeight: 140,
   },
-  optionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: Spacing.xs,
-  },
-  optionNumber: {
-    color: Colors.textTertiary,
+  cardNumber: {
+    color: Colors.accentOrange,
     fontSize: Typography.xl,
     fontWeight: FontWeight.extrabold,
+    marginBottom: Spacing.sm,
   },
-  iconCircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: 'rgba(255,107,43,0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  divider: {
+    height: 1,
+    backgroundColor: Colors.surfaceBorder,
+    marginBottom: Spacing.sm,
   },
-  optionLabel: {
-    color: Colors.textPrimary,
+  cardLabel: {
+    color: '#FFFFFF',
     fontSize: Typography.base,
     fontWeight: FontWeight.bold,
+    marginBottom: 4,
   },
-  optionDesc: {
-    color: Colors.textSecondary,
+  cardDesc: {
+    color: 'rgba(255,255,255,0.45)',
     fontSize: Typography.xs,
     lineHeight: 16,
   },
-  expertsCard: { marginTop: Spacing.md },
+  orLabel: {
+    color: 'rgba(255,255,255,0.35)',
+    fontSize: Typography.xs,
+    fontWeight: FontWeight.semibold,
+    letterSpacing: 1.5,
+    textAlign: 'center',
+    marginBottom: Spacing.lg,
+  },
 });

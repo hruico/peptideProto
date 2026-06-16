@@ -5,36 +5,42 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ChevronLeft } from 'lucide-react-native';
-import GradientButton from '../../components/ui/GradientButton';
-import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Colors, Typography, FontWeight, Spacing, Radii } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
 
 const SLIDES = [
   {
     id: '1',
-    emoji: '🧬',
-    title: 'Research-backed protocols',
-    body: 'Every protocol is built from peer-reviewed literature and validated by certified specialists.',
+    title: 'Your Goals,\nOur Guide',
+    body: 'From Retatrutide to BPC-157 — expert-curated protocols for every stage of your journey.',
+    tag: 'Expert Curated Protocols',
+    testimonial: 'Finally an app that makes peptides simple\n— Mike R.',
+    isDisclaimer: false,
   },
   {
     id: '2',
-    emoji: '🎯',
-    title: 'Personalised to you',
-    body: 'Goals, biology, and lifestyle all factor into your recommended stack.',
+    title: "We'll walk you\nthrough it",
+    body: "From your first reconstitution to your hundredth injection, we've got you covered with practical guidance, safety context, and schedule support.",
+    tag: 'Simple reconstitutions',
+    testimonial: 'Finally an app that makes peptides simple\n— Mike R.',
+    isDisclaimer: false,
   },
   {
     id: '3',
-    emoji: '🔬',
-    title: 'Precision dosing calculator',
-    body: 'Our reconstitution tool takes the guesswork out of preparation — to the microlitre.',
+    title: 'See your\ntransformation',
+    body: 'Real people, real results. Document your journey and watch your progress unfold week by week.',
+    tag: 'Track what matters to you',
+    testimonial: 'The calculator alone is worth it\n— Sarah J.',
+    isDisclaimer: false,
   },
   {
-    id: 'disclaimer',
-    emoji: '⚠️',
-    title: 'Important disclaimer',
-    body: 'The Peptide App is for informational purposes only. Nothing here constitutes medical advice. Always consult a qualified healthcare professional before starting any peptide protocol.',
+    id: '4',
+    title: 'This app is not\nmedical advice',
+    body: 'This app is for educational purposes only. Always consult a licensed healthcare provider before starting any protocol.',
+    tag: '',
+    testimonial: '',
     isDisclaimer: true,
   },
 ];
@@ -48,15 +54,9 @@ export default function CarouselScreen() {
     setActiveIndex(index);
   }
 
-  const isLastSlide = activeIndex === SLIDES.length - 1;
-
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
-
-      <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-        <ChevronLeft size={24} color={Colors.textSecondary} />
-      </TouchableOpacity>
 
       <FlatList
         ref={flatListRef}
@@ -68,92 +68,207 @@ export default function CarouselScreen() {
         onScroll={onScroll}
         scrollEventThrottle={16}
         renderItem={({ item }) => (
-          <View style={[styles.slide, item.isDisclaimer && styles.slideDisclaimer]}>
-            <Text style={styles.emoji}>{item.emoji}</Text>
-            <Text style={[styles.title, item.isDisclaimer && styles.titleDisclaimer]}>
-              {item.title}
-            </Text>
-            <Text style={styles.body}>{item.body}</Text>
+          <View style={styles.slide}>
+            {/* Image placeholder area */}
+            <View style={styles.imageArea}>
+              <LinearGradient
+                colors={item.isDisclaimer
+                  ? ['#1A2A4A', '#2A3A6A']
+                  : ['#1A2A4A', '#0D1B2A']}
+                style={styles.imagePlaceholder}
+              >
+                {item.isDisclaimer ? (
+                  <View style={styles.shieldContainer}>
+                    <View style={styles.shieldOuter}>
+                      <View style={styles.shieldInner}>
+                        <Text style={styles.shieldPlus}>+</Text>
+                      </View>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={styles.collageContainer}>
+                    <View style={styles.collageCard}>
+                      <Text style={styles.collageText}>{item.tag}</Text>
+                    </View>
+                  </View>
+                )}
+              </LinearGradient>
+            </View>
 
-            {item.isDisclaimer && (
-              <View style={styles.disclaimerFooter}>
-                <GradientButton
-                  label="I understand — let's go"
+            {/* Text content */}
+            <View style={styles.textBlock}>
+              <Text style={[styles.title, item.isDisclaimer && styles.titleLight]}>
+                {item.title}
+              </Text>
+              <Text style={styles.body}>{item.body}</Text>
+
+              {/* Testimonial */}
+              {!!item.testimonial && (
+                <View style={styles.testimonialRow}>
+                  <View style={styles.testimonialAvatar} />
+                  <Text style={styles.testimonialText}>{item.testimonial}</Text>
+                </View>
+              )}
+
+              {/* Disclaimer CTA */}
+              {item.isDisclaimer && (
+                <TouchableOpacity
+                  style={styles.understandBtn}
                   onPress={() => router.push('/onboarding/get-started')}
-                />
-              </View>
-            )}
+                  activeOpacity={0.85}
+                >
+                  <LinearGradient
+                    colors={[Colors.accentViolet, '#5B2FDF']}
+                    style={styles.understandGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    <Text style={styles.understandText}>I understand</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         )}
       />
 
-      {/* Page dots */}
+      {/* Dots */}
       <View style={styles.dots}>
         {SLIDES.map((_, i) => (
           <View key={i} style={[styles.dot, i === activeIndex && styles.dotActive]} />
         ))}
       </View>
-
-      {/* Next button — hidden on disclaimer slide (it has its own CTA) */}
-      {!isLastSlide && (
-        <View style={styles.footer}>
-          <GradientButton
-            label="Next"
-            onPress={() => {
-              flatListRef.current?.scrollToIndex({ index: activeIndex + 1, animated: true });
-            }}
-          />
-        </View>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.base },
-  back: { paddingTop: 56, paddingHorizontal: Spacing.md },
   slide: {
     width,
     flex: 1,
+  },
+  imageArea: {
+    flex: 1,
+    maxHeight: '50%',
+  },
+  imagePlaceholder: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing.xl,
-    gap: Spacing.md,
   },
-  slideDisclaimer: {
+  collageContainer: {
+    flex: 1,
+    alignItems: 'center',
     justifyContent: 'center',
   },
-  emoji: { fontSize: 64, marginBottom: Spacing.md },
+  collageCard: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: Radii.lg,
+    padding: Spacing.lg,
+    alignItems: 'center',
+  },
+  collageText: {
+    color: 'rgba(255,255,255,0.7)',
+    fontSize: Typography.sm,
+    fontWeight: FontWeight.medium,
+  },
+  // Shield for disclaimer
+  shieldContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shieldOuter: {
+    width: 120,
+    height: 140,
+    borderRadius: 60,
+    backgroundColor: 'rgba(96,165,250,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shieldInner: {
+    width: 80,
+    height: 90,
+    borderRadius: 40,
+    backgroundColor: 'rgba(96,165,250,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shieldPlus: {
+    color: '#60A5FA',
+    fontSize: 40,
+    fontWeight: FontWeight.bold,
+  },
+  textBlock: {
+    flex: 1,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.xl,
+    gap: Spacing.md,
+  },
   title: {
-    color: Colors.textPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.xxl,
-    fontWeight: FontWeight.extrabold,
-    textAlign: 'center',
+    fontWeight: FontWeight.bold,
     lineHeight: 36,
-  },
-  titleDisclaimer: { color: Colors.warning },
-  body: {
-    color: Colors.textSecondary,
-    fontSize: Typography.base,
     textAlign: 'center',
-    lineHeight: 26,
   },
-  disclaimerFooter: { marginTop: Spacing.xl, width: '100%' },
+  titleLight: {
+    fontSize: Typography.xl,
+  },
+  body: {
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: Typography.sm,
+    lineHeight: 22,
+    textAlign: 'center',
+  },
+  testimonialRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    backgroundColor: Colors.surfaceElevated,
+    borderRadius: Radii.lg,
+    padding: Spacing.sm,
+  },
+  testimonialAvatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.accentOrange,
+  },
+  testimonialText: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: Typography.xs,
+    flex: 1,
+    lineHeight: 16,
+  },
+  understandBtn: {
+    borderRadius: 32,
+    overflow: 'hidden',
+    marginTop: Spacing.sm,
+  },
+  understandGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  understandText: {
+    color: '#FFFFFF',
+    fontSize: Typography.base,
+    fontWeight: FontWeight.semibold,
+  },
   dots: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: Spacing.xs,
-    paddingBottom: Spacing.lg,
+    gap: 6,
+    paddingBottom: 32,
   },
   dot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: Colors.surfaceBorder,
+    backgroundColor: 'rgba(255,255,255,0.2)',
   },
   dotActive: {
-    backgroundColor: Colors.accentOrange,
+    backgroundColor: '#FFFFFF',
     width: 20,
   },
-  footer: { paddingHorizontal: Spacing.lg, paddingBottom: 40 },
 });

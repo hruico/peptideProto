@@ -5,7 +5,7 @@ import {
 import { router } from 'expo-router';
 import { useState } from 'react';
 import * as Linking from 'expo-linking';
-import { Target, Layers } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import HomeHeader from '../../components/ui/HomeHeader';
 import WeekDateStrip from '../../components/ui/WeekDateStrip';
@@ -52,11 +52,11 @@ export default function HomeScreen() {
               onPress={() => router.push('/onboarding/get-started')}
               activeOpacity={0.85}
             >
-              <View style={styles.jumpIcon}>
-                <Target size={22} color={Colors.accentOrange} />
-              </View>
-              <Text style={styles.jumpTitle}>Get guided</Text>
-              <Text style={styles.jumpSub}>Match peptides to your goals</Text>
+              <LinearGradient colors={['#1A2A4A', '#0D1B2A']} style={styles.jumpGradient}>
+                <Text style={styles.jumpEyebrow}>NEW HERE</Text>
+                <Text style={styles.jumpTitle}>Get guided</Text>
+                <Text style={styles.jumpSub}>Walk through goals,</Text>
+              </LinearGradient>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -64,11 +64,11 @@ export default function HomeScreen() {
               onPress={() => router.push('/reconstitute/add-blend')}
               activeOpacity={0.85}
             >
-              <View style={styles.jumpIcon}>
-                <Layers size={22} color={Colors.accentViolet} />
-              </View>
-              <Text style={styles.jumpTitle}>Bring your stack</Text>
-              <Text style={styles.jumpSub}>Add what you're already running</Text>
+              <LinearGradient colors={['#2A1A3A', '#1A0D2A']} style={styles.jumpGradient}>
+                <Text style={styles.jumpEyebrow}>ALREADY ON PEPTIDES</Text>
+                <Text style={styles.jumpTitle}>Bring your stack</Text>
+                <Text style={styles.jumpSub}>Log what you're taking or</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
@@ -169,30 +169,30 @@ const styles = StyleSheet.create({
   },
   jumpCard: {
     flex: 1,
-    backgroundColor: Colors.surfaceElevated,
     borderRadius: Radii.xl,
-    padding: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
-    gap: Spacing.xs,
+    overflow: 'hidden',
+    height: 130,
   },
-  jumpIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.xs,
+  jumpGradient: {
+    flex: 1,
+    padding: Spacing.md,
+    justifyContent: 'flex-end',
+  },
+  jumpEyebrow: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 9,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.8,
+    marginBottom: 4,
   },
   jumpTitle: {
-    color: Colors.textPrimary,
-    fontSize: Typography.sm,
-    fontWeight: FontWeight.bold,
+    color: '#FFFFFF',
+    fontSize: Typography.base,
+    fontWeight: FontWeight.extrabold,
   },
   jumpSub: {
-    color: Colors.textTertiary,
+    color: 'rgba(255,255,255,0.5)',
     fontSize: Typography.xs,
-    lineHeight: 15,
+    marginTop: 2,
   },
 });
