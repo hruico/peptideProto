@@ -1,0 +1,20 @@
+node_modules
+.expo
+dist
+.vscode
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# Dev docs not meant for repo
+peptide-app-implementation-plan.md
+
+# OS
+.DS_Store
+Thumbs.db
