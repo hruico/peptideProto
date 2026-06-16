@@ -79,7 +79,7 @@ export default function SplashScreen() {
       <Animated.View style={[styles.buttonWrapper, { opacity: buttonOpacity }]}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push('/onboarding/sex')}
+          onPress={() => router.push('/onboarding/personalize')}
           activeOpacity={0.85}
         >
           <Text style={styles.buttonText}>FIND YOUR PROTOCOL</Text>

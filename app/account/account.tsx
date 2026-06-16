@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { X, Image as ImageIcon, ChevronRight } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
@@ -56,6 +56,11 @@ export default function AccountScreen() {
         <TouchableOpacity
           style={[styles.profileRow, isGuest && styles.profileRowDisabled]}
           disabled={isGuest}
+          onPress={() => {
+            if (!isGuest) {
+              Alert.alert('Public Profile', 'Public profile setup coming soon!');
+            }
+          }}
           activeOpacity={0.8}
         >
           <View style={styles.profileRowLeft}>

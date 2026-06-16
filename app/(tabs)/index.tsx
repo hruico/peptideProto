@@ -55,7 +55,7 @@ export default function HomeScreen() {
               <LinearGradient colors={['#1A2A4A', '#0D1B2A']} style={styles.jumpGradient}>
                 <Text style={styles.jumpEyebrow}>NEW HERE</Text>
                 <Text style={styles.jumpTitle}>Get guided</Text>
-                <Text style={styles.jumpSub}>Walk through goals,</Text>
+                <Text style={styles.jumpSub}>Walk through your goals</Text>
               </LinearGradient>
             </TouchableOpacity>
 
@@ -67,7 +67,7 @@ export default function HomeScreen() {
               <LinearGradient colors={['#2A1A3A', '#1A0D2A']} style={styles.jumpGradient}>
                 <Text style={styles.jumpEyebrow}>ALREADY ON PEPTIDES</Text>
                 <Text style={styles.jumpTitle}>Bring your stack</Text>
-                <Text style={styles.jumpSub}>Log what you're taking or</Text>
+                <Text style={styles.jumpSub}>Log what you're already taking</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>

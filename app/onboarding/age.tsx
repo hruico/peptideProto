@@ -12,8 +12,8 @@ const AGE_OPTIONS: { label: string; value: AgeRange }[] = [
   { label: '30–39', value: '26-35' },
   { label: '40–49', value: '36-45' },
   { label: '50–59', value: '46-55' },
-  { label: '60+', value: '55+' },
-  { label: 'Prefer not to say', value: '55+' },
+  { label: '60+',   value: '55+' },
+  { label: 'Prefer not to say', value: '46-55' },
 ];
 
 export default function AgeScreen() {
