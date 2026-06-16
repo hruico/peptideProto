@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { FlaskConical, Plus, ChevronRight, Blend } from 'lucide-react-native';
-import GradientButton from '../../components/ui/GradientButton';
+import { Layers } from 'lucide-react-native';
 import { useVialStore } from '../../store/useVialStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 import type { Vial } from '../../types';
@@ -15,23 +14,27 @@ export default function ReconstituteScreen() {
       <StatusBar style="light" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Reconstitute</Text>
+        {/* Vial illustration */}
+        <View style={styles.heroSection}>
+          <Image
+            source={require('../../assets/images/splash-icon.png')}
+            style={styles.vialImage}
+            resizeMode="contain"
+          />
+        </View>
+
+        {/* Headline */}
+        <View style={styles.textSection}>
+          <Text style={styles.title}>Reconstitute Your{'\n'}First Peptide</Text>
           <Text style={styles.subtitle}>
-            Calculate draw volumes and manage your vials with precision.
+            Calculate the perfect mix ratio and get step-by-step guidance for safe reconstitution.
           </Text>
         </View>
 
-        {/* Vial illustration */}
-        <View style={styles.illustration}>
-          <FlaskConical size={72} color={Colors.accentOrange} strokeWidth={1.2} />
-        </View>
-
-        {/* Your Vials — only show when vials exist */}
+        {/* Your Vials */}
         {vials.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Your Vials</Text>
+          <View style={styles.vialsSection}>
+            <Text style={styles.sectionLabel}>YOUR VIALS</Text>
             {vials.map((vial) => (
               <VialRow key={vial.id} vial={vial} />
             ))}
@@ -39,60 +42,35 @@ export default function ReconstituteScreen() {
         )}
 
         {/* Action buttons */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Get started</Text>
-          <View style={styles.buttonsCol}>
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => router.push('/reconstitute/new-peptide')}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: 'rgba(255,107,43,0.12)' }]}>
-                <FlaskConical size={22} color={Colors.accentOrange} />
-              </View>
-              <View style={styles.actionText}>
-                <Text style={styles.actionTitle}>Reconstitute a peptide</Text>
-                <Text style={styles.actionDesc}>
-                  Add BAC water to lyophilised powder
-                </Text>
-              </View>
-              <ChevronRight size={18} color={Colors.textTertiary} />
-            </TouchableOpacity>
+        <View style={styles.buttonsSection}>
+          {/* Primary orange button */}
+          <TouchableOpacity
+            style={styles.primaryBtn}
+            onPress={() => router.push('/reconstitute/new-peptide')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.primaryBtnText}>Reconstitute New Peptide</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => router.push('/reconstitute/pre-mixed')}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: 'rgba(123,79,255,0.12)' }]}>
-                <Plus size={22} color={Colors.accentViolet} />
-              </View>
-              <View style={styles.actionText}>
-                <Text style={styles.actionTitle}>Pre-mixed / known concentration</Text>
-                <Text style={styles.actionDesc}>
-                  Calculate from an existing solution
-                </Text>
-              </View>
-              <ChevronRight size={18} color={Colors.textTertiary} />
-            </TouchableOpacity>
+          {/* Secondary buttons */}
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() => router.push('/reconstitute/pre-mixed')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.secondaryBtnText}>Add Pre-Mixed Solution</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.actionCard}
-              onPress={() => router.push('/reconstitute/add-blend')}
-              activeOpacity={0.85}
-            >
-              <View style={[styles.actionIcon, { backgroundColor: 'rgba(46,204,113,0.12)' }]}>
-                <Blend size={22} color={Colors.success} />
-              </View>
-              <View style={styles.actionText}>
-                <Text style={styles.actionTitle}>Add a blend</Text>
-                <Text style={styles.actionDesc}>
-                  Popular combos or create your own
-                </Text>
-              </View>
-              <ChevronRight size={18} color={Colors.textTertiary} />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            style={styles.secondaryBtn}
+            onPress={() => router.push('/reconstitute/add-blend')}
+            activeOpacity={0.85}
+          >
+            <View style={styles.blendBtnInner}>
+              <Layers size={16} color="rgba(255,255,255,0.7)" />
+              <Text style={styles.secondaryBtnText}>Add Blend</Text>
+            </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -104,14 +82,11 @@ function VialRow({ vial }: { vial: Vial }) {
     <View style={vialStyles.row}>
       <View style={vialStyles.left}>
         <Text style={vialStyles.name}>{vial.peptideName}</Text>
-        {vial.label ? <Text style={vialStyles.label}>{vial.label}</Text> : null}
         <Text style={vialStyles.conc}>
           {vial.concentrationMcgPerMl.toFixed(0)} mcg/mL · {vial.totalVolumeMl} mL
         </Text>
       </View>
-      <View style={vialStyles.badge}>
-        <Text style={vialStyles.badgeText}>{vial.type}</Text>
-      </View>
+      <Text style={vialStyles.type}>{vial.type}</Text>
     </View>
   );
 }
@@ -128,98 +103,85 @@ const vialStyles = StyleSheet.create({
     borderColor: Colors.surfaceBorder,
   },
   left: { flex: 1 },
-  name: {
-    color: Colors.textPrimary,
-    fontSize: Typography.base,
-    fontWeight: FontWeight.semibold,
-  },
-  label: {
-    color: Colors.textTertiary,
-    fontSize: Typography.xs,
-    marginTop: 2,
-  },
-  conc: {
-    color: Colors.accentOrange,
-    fontSize: Typography.xs,
-    marginTop: 2,
-    fontWeight: FontWeight.medium,
-  },
-  badge: {
-    backgroundColor: 'rgba(255,107,43,0.12)',
-    borderRadius: Radii.full,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 3,
-  },
-  badgeText: {
-    color: Colors.accentOrange,
-    fontSize: Typography.xs,
-    fontWeight: FontWeight.semibold,
-    textTransform: 'capitalize',
-  },
+  name: { color: '#FFF', fontSize: Typography.base, fontWeight: FontWeight.semibold },
+  conc: { color: Colors.accentOrange, fontSize: Typography.xs, marginTop: 2 },
+  type: { color: 'rgba(255,255,255,0.4)', fontSize: Typography.xs, textTransform: 'capitalize' },
 });
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.base },
-  scroll: { paddingBottom: 40 },
-  header: {
-    paddingTop: 56,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
+  scroll: { paddingBottom: 48 },
+  heroSection: {
+    alignItems: 'center',
+    paddingTop: 80,
+    paddingBottom: Spacing.lg,
+  },
+  vialImage: {
+    width: 120,
+    height: 120,
+    tintColor: Colors.accentOrange,
+  },
+  textSection: {
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xl,
+    gap: Spacing.sm,
+    marginBottom: Spacing.xl,
   },
   title: {
-    color: Colors.textPrimary,
+    color: '#FFFFFF',
     fontSize: Typography.xxl,
     fontWeight: FontWeight.extrabold,
+    textAlign: 'center',
+    lineHeight: 36,
   },
   subtitle: {
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.5)',
     fontSize: Typography.sm,
-    marginTop: 4,
-    lineHeight: 20,
+    textAlign: 'center',
+    lineHeight: 22,
   },
-  illustration: {
-    alignItems: 'center',
-    paddingVertical: Spacing.xl,
-  },
-  section: {
+  vialsSection: {
     paddingHorizontal: Spacing.lg,
-    marginTop: Spacing.md,
+    marginBottom: Spacing.lg,
   },
-  sectionTitle: {
-    color: Colors.textTertiary,
+  sectionLabel: {
+    color: 'rgba(255,255,255,0.4)',
     fontSize: Typography.xs,
     fontWeight: FontWeight.semibold,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: Spacing.md,
+    letterSpacing: 1.5,
+    marginBottom: Spacing.sm,
   },
-  buttonsCol: { gap: Spacing.sm },
-  actionCard: {
-    flexDirection: 'row',
+  buttonsSection: {
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.sm,
+  },
+  primaryBtn: {
+    backgroundColor: Colors.accentOrange,
+    borderRadius: 32,
+    paddingVertical: 18,
     alignItems: 'center',
+  },
+  primaryBtnText: {
+    color: '#FFFFFF',
+    fontSize: Typography.base,
+    fontWeight: FontWeight.bold,
+  },
+  secondaryBtn: {
     backgroundColor: Colors.surfaceElevated,
-    borderRadius: Radii.xl,
-    padding: Spacing.md,
+    borderRadius: 32,
+    paddingVertical: 18,
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: Colors.surfaceBorder,
-    gap: Spacing.md,
   },
-  actionIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionText: { flex: 1 },
-  actionTitle: {
-    color: Colors.textPrimary,
+  secondaryBtnText: {
+    color: 'rgba(255,255,255,0.75)',
     fontSize: Typography.base,
-    fontWeight: FontWeight.semibold,
+    fontWeight: FontWeight.medium,
   },
-  actionDesc: {
-    color: Colors.textTertiary,
-    fontSize: Typography.xs,
-    marginTop: 2,
+  blendBtnInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
   },
 });

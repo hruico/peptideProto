@@ -1,26 +1,29 @@
 import { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import GradientButton from '../../components/ui/GradientButton';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Colors, Typography, FontWeight, Spacing } from '../../constants/theme';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
+// Generate stable star positions
+const STARS = Array.from({ length: 80 }, (_, i) => ({
+  id: i,
+  top: (i * 137.508) % 100,
+  left: (i * 97.3) % 100,
+  size: (i % 3) + 1,
+  opacity: 0.3 + (i % 5) * 0.1,
+}));
 
 export default function SplashScreen() {
   const titleOpacity = useRef(new Animated.Value(0)).current;
-  const titleTranslate = useRef(new Animated.Value(20)).current;
-  const subtitleOpacity = useRef(new Animated.Value(0)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.sequence([
-      Animated.parallel([
-        Animated.timing(titleOpacity, { toValue: 1, duration: 800, useNativeDriver: true }),
-        Animated.timing(titleTranslate, { toValue: 0, duration: 800, useNativeDriver: true }),
-      ]),
-      Animated.timing(subtitleOpacity, { toValue: 1, duration: 500, useNativeDriver: true }),
-      Animated.timing(buttonOpacity, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.timing(titleOpacity, { toValue: 1, duration: 1200, useNativeDriver: true }),
+      Animated.timing(buttonOpacity, { toValue: 1, duration: 600, useNativeDriver: true }),
     ]).start();
   }, []);
 
@@ -28,56 +31,59 @@ export default function SplashScreen() {
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* Starfield bg placeholder */}
-      <View style={styles.starfield}>
-        {Array.from({ length: 40 }).map((_, i) => (
-          <View
-            key={i}
-            style={[
-              styles.star,
-              {
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                width: Math.random() * 2 + 1,
-                height: Math.random() * 2 + 1,
-                opacity: Math.random() * 0.6 + 0.2,
-              },
-            ]}
-          />
-        ))}
-      </View>
+      {/* Deep space gradient background */}
+      <LinearGradient
+        colors={['#0D1B2A', '#1B2A4A', '#2A3A6A', '#1A2040']}
+        style={StyleSheet.absoluteFillObject}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+      />
 
-      {/* Vial illustration placeholder */}
-      <View style={styles.vialContainer}>
-        <Image
-          source={require('../../assets/images/splash-icon.png')}
-          style={styles.vialImage}
-          resizeMode="contain"
+      {/* Stars */}
+      {STARS.map((star) => (
+        <View
+          key={star.id}
+          style={[
+            styles.star,
+            {
+              top: `${star.top}%` as any,
+              left: `${star.left}%` as any,
+              width: star.size,
+              height: star.size,
+              opacity: star.opacity,
+            },
+          ]}
         />
+      ))}
+
+      {/* Mountain silhouette at bottom */}
+      <View style={styles.mountainContainer}>
+        <LinearGradient
+          colors={['transparent', '#0D1B2A']}
+          style={styles.mountainFade}
+        />
+        {/* Simplified mountain shapes */}
+        <View style={styles.mountainLeft} />
+        <View style={styles.mountainRight} />
+        <View style={styles.mountainCenter} />
       </View>
 
-      {/* Animated wordmark */}
-      <Animated.View
-        style={[
-          styles.titleContainer,
-          { opacity: titleOpacity, transform: [{ translateY: titleTranslate }] },
-        ]}
-      >
-        <Text style={styles.titleSmall}>THE</Text>
-        <Text style={styles.titleLarge}>PEPTIDE</Text>
-        <Text style={styles.titleSmall}>APP</Text>
+      {/* Wordmark - centered */}
+      <Animated.View style={[styles.titleContainer, { opacity: titleOpacity }]}>
+        <Text style={styles.titleLine}>THE</Text>
+        <Text style={styles.titleLine}>PEPTIDE</Text>
+        <Text style={styles.titleLine}>APP</Text>
       </Animated.View>
 
-      <Animated.Text style={[styles.tagline, { opacity: subtitleOpacity }]}>
-        Science-backed. Personalised. Yours.
-      </Animated.Text>
-
+      {/* CTA Button */}
       <Animated.View style={[styles.buttonWrapper, { opacity: buttonOpacity }]}>
-        <GradientButton
-          label="FIND YOUR PROTOCOL"
-          variant="primary-orange"
-          onPress={() => router.push('/onboarding/personalize')}
-        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push('/onboarding/sex')}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.buttonText}>FIND YOUR PROTOCOL</Text>
+        </TouchableOpacity>
       </Animated.View>
     </View>
   );
@@ -86,50 +92,98 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.base,
+    backgroundColor: '#0D1B2A',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing.xl,
-  },
-  starfield: {
-    ...StyleSheet.absoluteFillObject,
   },
   star: {
     position: 'absolute',
     backgroundColor: '#FFFFFF',
     borderRadius: 99,
   },
-  vialContainer: {
-    marginBottom: Spacing.xl,
+  mountainContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: height * 0.35,
   },
-  vialImage: {
-    width: 100,
-    height: 100,
-    tintColor: Colors.accentOrange,
+  mountainFade: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 80,
+  },
+  mountainLeft: {
+    position: 'absolute',
+    bottom: 0,
+    left: -20,
+    width: 0,
+    height: 0,
+    borderLeftWidth: 160,
+    borderRightWidth: 160,
+    borderBottomWidth: 220,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#1A2535',
+  },
+  mountainRight: {
+    position: 'absolute',
+    bottom: 0,
+    right: -20,
+    width: 0,
+    height: 0,
+    borderLeftWidth: 140,
+    borderRightWidth: 140,
+    borderBottomWidth: 190,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#1E2B3E',
+  },
+  mountainCenter: {
+    position: 'absolute',
+    bottom: 0,
+    left: width / 2 - 140,
+    width: 0,
+    height: 0,
+    borderLeftWidth: 140,
+    borderRightWidth: 140,
+    borderBottomWidth: 260,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#162030',
   },
   titleContainer: {
     alignItems: 'center',
-    marginBottom: Spacing.md,
+    marginBottom: 180,
   },
-  titleSmall: {
-    color: Colors.textSecondary,
-    fontSize: Typography.md,
-    fontWeight: FontWeight.semibold,
-    letterSpacing: 6,
-  },
-  titleLarge: {
-    color: Colors.textPrimary,
-    fontSize: Typography.xxxl,
-    fontWeight: FontWeight.extrabold,
-    letterSpacing: 4,
-  },
-  tagline: {
-    color: Colors.textTertiary,
-    fontSize: Typography.sm,
-    letterSpacing: 1,
-    marginBottom: Spacing.xxl,
+  titleLine: {
+    color: '#FFFFFF',
+    fontSize: 44,
+    fontWeight: '300' as const,
+    letterSpacing: 12,
+    lineHeight: 56,
+    textAlign: 'center',
   },
   buttonWrapper: {
-    width: '100%',
+    position: 'absolute',
+    bottom: 60,
+    left: Spacing.xl,
+    right: Spacing.xl,
+  },
+  button: {
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+    borderRadius: 32,
+    paddingVertical: 16,
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: Typography.sm,
+    fontWeight: FontWeight.semibold,
+    letterSpacing: 2,
   },
 });

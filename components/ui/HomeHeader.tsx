@@ -1,33 +1,30 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Bell, Bookmark, User } from 'lucide-react-native';
+import { Activity, BookOpen, User } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { Colors, Typography, FontWeight, Spacing } from '../../constants/theme';
 
 export default function HomeHeader() {
   return (
     <View style={styles.container}>
-      {/* Avatar / Account */}
+      {/* Avatar */}
       <TouchableOpacity
-        style={styles.avatar}
+        style={styles.iconBtn}
         onPress={() => router.push('/account/account' as any)}
         activeOpacity={0.8}
       >
-        <User size={18} color={Colors.textSecondary} />
+        <User size={20} color="rgba(255,255,255,0.7)" />
       </TouchableOpacity>
 
-      {/* Title */}
-      <View style={styles.titleBlock}>
-        <Text style={styles.welcome}>Welcome back</Text>
-        <Text style={styles.appName}>THE PEPTIDE APP</Text>
-      </View>
+      {/* Centered title */}
+      <Text style={styles.title}>Welcome</Text>
 
       {/* Right icons */}
       <View style={styles.rightIcons}>
-        <TouchableOpacity activeOpacity={0.7}>
-          <Bell size={22} color={Colors.textSecondary} />
+        <TouchableOpacity style={styles.iconBtn} activeOpacity={0.7}>
+          <Activity size={20} color="rgba(255,255,255,0.7)" />
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.7}>
-          <Bookmark size={22} color={Colors.textSecondary} />
+        <TouchableOpacity style={styles.iconBtn} activeOpacity={0.7}>
+          <BookOpen size={20} color="rgba(255,255,255,0.7)" />
         </TouchableOpacity>
       </View>
     </View>
@@ -42,34 +39,22 @@ const styles = StyleSheet.create({
     paddingTop: 56,
     paddingBottom: Spacing.md,
     backgroundColor: Colors.base,
-    gap: Spacing.md,
   },
-  avatar: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: Colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
+  iconBtn: {
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  titleBlock: {
+  title: {
     flex: 1,
-  },
-  welcome: {
-    color: Colors.textTertiary,
-    fontSize: Typography.xs,
-    fontWeight: FontWeight.medium,
-  },
-  appName: {
-    color: Colors.textPrimary,
-    fontSize: Typography.sm,
-    fontWeight: FontWeight.extrabold,
-    letterSpacing: 1.5,
+    color: '#FFFFFF',
+    fontSize: Typography.lg,
+    fontWeight: FontWeight.semibold,
+    textAlign: 'center',
   },
   rightIcons: {
     flexDirection: 'row',
-    gap: Spacing.md,
+    gap: 4,
   },
 });

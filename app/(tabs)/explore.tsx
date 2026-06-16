@@ -103,20 +103,33 @@ export default function ExploreScreen() {
 
       {/* Protocols tab */}
       {activeTab === 'Protocols' && (
-        <FlatList
-          data={filteredProtocols}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          renderItem={({ item }) => (
-            <ProtocolHeroCard
-              protocol={item}
-              onPress={() => router.push(`/protocol/${item.id}`)}
-              width={undefined as any}
-            />
-          )}
-          ListEmptyComponent={<EmptyState message={`No protocols found for "${query}"`} />}
-        />
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent}>
+          <Text style={styles.sectionHeading}>Curated combos</Text>
+          <Text style={styles.sectionSub}>Ready-made stacks. Pick one and start in minutes.</Text>
+          <Text style={styles.sectionLabel}>POPULAR ON THE INTERNET</Text>
+          {filteredProtocols
+            .filter(p => p.category === 'curated-combo')
+            .map(item => (
+              <ProtocolHeroCard
+                key={item.id}
+                protocol={item}
+                onPress={() => router.push(`/protocol/${item.id}`)}
+                fullWidth
+              />
+            ))}
+          <Text style={[styles.sectionLabel, { marginTop: Spacing.lg }]}>FEATURED EXPERT PROTOCOLS</Text>
+          {filteredProtocols
+            .filter(p => p.category === 'expert-protocol')
+            .map(item => (
+              <ProtocolHeroCard
+                key={item.id}
+                protocol={item}
+                onPress={() => router.push(`/protocol/${item.id}`)}
+                fullWidth
+              />
+            ))}
+          {filteredProtocols.length === 0 && <EmptyState message={`No protocols found for "${query}"`} />}
+        </ScrollView>
       )}
 
       {/* Peptides tab */}
@@ -255,6 +268,24 @@ const styles = StyleSheet.create({
   },
   columnWrapper: { gap: Spacing.md, marginBottom: Spacing.md },
   gridItem: { flex: 1 },
+  sectionHeading: {
+    color: '#FFFFFF',
+    fontSize: Typography.xxl,
+    fontWeight: FontWeight.extrabold,
+    marginBottom: 4,
+  },
+  sectionSub: {
+    color: 'rgba(255,255,255,0.45)',
+    fontSize: Typography.sm,
+    marginBottom: Spacing.lg,
+  },
+  sectionLabel: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: Typography.xs,
+    fontWeight: FontWeight.semibold,
+    letterSpacing: 1.5,
+    marginBottom: Spacing.sm,
+  },
   // Modal
   modalOverlay: {
     flex: 1,

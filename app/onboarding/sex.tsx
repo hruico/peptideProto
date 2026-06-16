@@ -3,13 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft } from 'lucide-react-native';
-import OnboardingOptionPill from '../../components/ui/OnboardingOptionPill';
-import GradientButton from '../../components/ui/GradientButton';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
-import { Colors, Typography, FontWeight, Spacing } from '../../constants/theme';
+import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 import type { Sex } from '../../types';
 
-const OPTIONS: { label: string; value: Sex; subtitle?: string }[] = [
+const OPTIONS: { label: string; value: Sex }[] = [
   { label: 'Male', value: 'male' },
   { label: 'Female', value: 'female' },
   { label: 'Prefer not to say', value: 'prefer-not-to-say' },
@@ -19,71 +17,103 @@ export default function SexScreen() {
   const { sex, setSex } = useOnboardingStore();
   const [selected, setSelected] = useState<Sex | null>(sex);
 
-  function handleContinue() {
-    if (!selected) return;
-    setSex(selected);
-    router.push('/onboarding/age');
+  function handleSelect(value: Sex) {
+    setSelected(value);
+    setSex(value);
+    setTimeout(() => router.push('/onboarding/age'), 200);
   }
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* Back */}
       <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-        <ChevronLeft size={24} color={Colors.textSecondary} />
+        <ChevronLeft size={24} color="rgba(255,255,255,0.6)" />
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <Text style={styles.step}>1 of 3</Text>
-        <Text style={styles.heading}>What's your biological sex?</Text>
-        <Text style={styles.sub}>Helps us calibrate dosing recommendations.</Text>
+        <Text style={styles.heading}>What's your sex?</Text>
+        <Text style={styles.sub}>Protocols are tailored to your biology</Text>
 
         <View style={styles.options}>
           {OPTIONS.map((opt) => (
-            <OnboardingOptionPill
+            <TouchableOpacity
               key={opt.value}
-              label={opt.label}
-              selected={selected === opt.value}
-              onPress={() => setSelected(opt.value)}
-            />
+              style={[styles.pill, selected === opt.value && styles.pillSelected]}
+              onPress={() => handleSelect(opt.value)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.pillText, selected === opt.value && styles.pillTextSelected]}>
+                {opt.label}
+              </Text>
+            </TouchableOpacity>
           ))}
         </View>
-      </View>
-
-      <View style={styles.footer}>
-        <GradientButton
-          label="Continue"
-          onPress={handleContinue}
-          disabled={!selected}
-        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
-  back: { paddingTop: 56, paddingHorizontal: Spacing.md },
-  content: { flex: 1, paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl },
-  step: {
-    color: Colors.accentOrange,
-    fontSize: Typography.sm,
-    fontWeight: FontWeight.semibold,
-    letterSpacing: 1,
-    marginBottom: Spacing.sm,
+  container: {
+    flex: 1,
+    backgroundColor: Colors.base,
+  },
+  back: {
+    position: 'absolute',
+    top: 52,
+    left: Spacing.lg,
+    zIndex: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.xl,
+    gap: Spacing.sm,
   },
   heading: {
-    color: Colors.textPrimary,
-    fontSize: Typography.xl,
-    fontWeight: FontWeight.extrabold,
-    marginBottom: Spacing.sm,
+    color: '#FFFFFF',
+    fontSize: Typography.xxl,
+    fontWeight: FontWeight.bold,
+    textAlign: 'center',
+    marginBottom: Spacing.xs,
   },
   sub: {
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.5)',
     fontSize: Typography.sm,
+    textAlign: 'center',
     marginBottom: Spacing.xl,
   },
-  options: { gap: 0 },
-  footer: { padding: Spacing.lg, paddingBottom: 40 },
+  options: {
+    width: '100%',
+    gap: Spacing.sm,
+  },
+  pill: {
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: Radii.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    paddingVertical: 18,
+    alignItems: 'center',
+  },
+  pillSelected: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.4)',
+  },
+  pillText: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: Typography.md,
+    fontWeight: FontWeight.medium,
+  },
+  pillTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: FontWeight.semibold,
+  },
 });

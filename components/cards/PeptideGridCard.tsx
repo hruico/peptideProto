@@ -1,17 +1,17 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import { Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 import type { Peptide } from '../../types';
 
-// Map category to a background accent color
-const CATEGORY_COLORS: Record<string, string> = {
-  'Recovery & Healing': '#1A2A3A',
-  'Fat Loss': '#2A1A1A',
-  'Muscle & Performance': '#1A2A1A',
-  'Cognitive & Neuroprotection': '#231A2A',
-  'Sleep & Longevity': '#1A1A2A',
-  'Sexual Health': '#2A1A2A',
-  'Skin & Aesthetics': '#2A2A1A',
-  'GI & Gut Health': '#1A2A2A',
+// Vibrant colors matching the design screenshots
+const CATEGORY_COLORS: Record<string, { bg: string; label: string }> = {
+  'Fat Loss':                    { bg: '#F97316', label: 'FAT LOSS' },
+  'Recovery & Healing':          { bg: '#22C55E', label: 'HEALING' },
+  'Muscle & Performance':        { bg: '#EF4444', label: 'PERFORMANCE' },
+  'Cognitive & Neuroprotection': { bg: '#8B5CF6', label: 'BRAIN' },
+  'Sleep & Longevity':           { bg: '#3B82F6', label: 'LONGEVITY' },
+  'Sexual Health':               { bg: '#EC4899', label: 'VITALITY' },
+  'Skin & Aesthetics':           { bg: '#F59E0B', label: 'SKIN & REPAIR' },
+  'GI & Gut Health':             { bg: '#10B981', label: 'GUT HEALTH' },
 };
 
 interface Props {
@@ -20,28 +20,24 @@ interface Props {
 }
 
 export default function PeptideGridCard({ peptide, onPress }: Props) {
-  const bgColor = CATEGORY_COLORS[peptide.category] ?? Colors.surfaceElevated;
+  const config = CATEGORY_COLORS[peptide.category] ?? { bg: '#7B4FFF', label: 'PEPTIDE' };
   const firstLetter = peptide.name.charAt(0).toUpperCase();
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: bgColor }]}
+      style={[styles.card, { backgroundColor: config.bg }]}
       onPress={onPress}
       activeOpacity={0.85}
     >
-      {/* Giant translucent watermark letter */}
+      {/* Giant translucent watermark */}
       <Text style={styles.watermark}>{firstLetter}</Text>
 
       {/* Category label */}
-      <View style={styles.categoryBadge}>
-        <Text style={styles.categoryText} numberOfLines={1}>{peptide.category}</Text>
-      </View>
+      <Text style={styles.categoryLabel}>{config.label}</Text>
 
       {/* Name & description */}
-      <View style={styles.textBlock}>
-        <Text style={styles.name}>{peptide.name}</Text>
-        <Text style={styles.description} numberOfLines={2}>{peptide.description}</Text>
-      </View>
+      <Text style={styles.name}>{peptide.name}</Text>
+      <Text style={styles.description} numberOfLines={2}>{peptide.description}</Text>
     </TouchableOpacity>
   );
 }
@@ -53,43 +49,34 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     minHeight: 160,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   },
   watermark: {
     position: 'absolute',
     right: -8,
-    top: -12,
-    fontSize: 100,
+    top: -16,
+    fontSize: 110,
     fontWeight: FontWeight.extrabold,
-    color: 'rgba(255,255,255,0.05)',
-    lineHeight: 110,
+    color: 'rgba(255,255,255,0.15)',
+    lineHeight: 120,
   },
-  categoryBadge: {
-    alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: Radii.full,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 3,
-  },
-  categoryText: {
-    color: Colors.textTertiary,
-    fontSize: Typography.xs,
-    fontWeight: FontWeight.medium,
-  },
-  textBlock: {
-    gap: 4,
-    marginTop: Spacing.sm,
+  categoryLabel: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 9,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 0.8,
+    marginBottom: 4,
   },
   name: {
-    color: Colors.textPrimary,
-    fontSize: Typography.base,
-    fontWeight: FontWeight.bold,
+    color: '#FFFFFF',
+    fontSize: Typography.md,
+    fontWeight: FontWeight.extrabold,
+    lineHeight: 22,
   },
   description: {
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.7)',
     fontSize: Typography.xs,
-    lineHeight: 16,
+    lineHeight: 15,
+    marginTop: 2,
   },
 });

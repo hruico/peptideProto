@@ -2,11 +2,11 @@
 // Dark theme with orange + violet accents
 
 export const Colors = {
-  // Backgrounds
-  base: '#0A0A0F',
-  surface: '#13131A',
-  surfaceElevated: '#1C1C26',
-  surfaceBorder: '#2A2A3A',
+  // Backgrounds — deep navy matching design
+  base: '#12132A',
+  surface: '#1A1B3A',
+  surfaceElevated: '#22244A',
+  surfaceBorder: '#2E3060',
 
   // Accents
   accentOrange: '#FF6B2B',

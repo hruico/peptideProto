@@ -1,30 +1,29 @@
 import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft } from 'lucide-react-native';
-import OnboardingOptionPill from '../../components/ui/OnboardingOptionPill';
-import GradientButton from '../../components/ui/GradientButton';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
-import { Colors, Typography, FontWeight, Spacing } from '../../constants/theme';
+import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 import type { AgeRange } from '../../types';
 
-const AGE_RANGES: { label: string; value: AgeRange; subtitle: string }[] = [
-  { label: '18–25', value: '18-25', subtitle: 'Young adult' },
-  { label: '26–35', value: '26-35', subtitle: 'Peak performance' },
-  { label: '36–45', value: '36-45', subtitle: 'Optimisation phase' },
-  { label: '46–55', value: '46-55', subtitle: 'Longevity focus' },
-  { label: '55+',   value: '55+',   subtitle: 'Age-defying' },
+const AGE_OPTIONS: { label: string; value: AgeRange }[] = [
+  { label: '18–29', value: '18-25' },
+  { label: '30–39', value: '26-35' },
+  { label: '40–49', value: '36-45' },
+  { label: '50–59', value: '46-55' },
+  { label: '60+', value: '55+' },
+  { label: 'Prefer not to say', value: '55+' },
 ];
 
 export default function AgeScreen() {
-  const { ageRange, setAgeRange } = useOnboardingStore();
-  const [selected, setSelected] = useState<AgeRange | null>(ageRange);
+  const { setAgeRange } = useOnboardingStore();
+  const [selected, setSelected] = useState<string | null>(null);
 
-  function handleContinue() {
-    if (!selected) return;
-    setAgeRange(selected);
-    router.push('/onboarding/carousel');
+  function handleSelect(value: AgeRange, label: string) {
+    setSelected(label);
+    setAgeRange(value);
+    setTimeout(() => router.push('/onboarding/carousel'), 200);
   }
 
   return (
@@ -32,57 +31,94 @@ export default function AgeScreen() {
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.back} onPress={() => router.back()}>
-        <ChevronLeft size={24} color={Colors.textSecondary} />
+        <ChevronLeft size={24} color="rgba(255,255,255,0.6)" />
       </TouchableOpacity>
 
       <View style={styles.content}>
-        <Text style={styles.step}>2 of 3</Text>
         <Text style={styles.heading}>How old are you?</Text>
-        <Text style={styles.sub}>Age influences optimal peptide cycling and dosing.</Text>
+        <Text style={styles.sub}>Dosing varies by age group</Text>
 
-        {AGE_RANGES.map((opt) => (
-          <OnboardingOptionPill
-            key={opt.value}
-            label={opt.label}
-            subtitle={opt.subtitle}
-            selected={selected === opt.value}
-            onPress={() => setSelected(opt.value)}
-          />
-        ))}
-      </View>
-
-      <View style={styles.footer}>
-        <GradientButton
-          label="Continue"
-          onPress={handleContinue}
-          disabled={!selected}
-        />
+        <View style={styles.grid}>
+          {AGE_OPTIONS.map((opt) => (
+            <TouchableOpacity
+              key={opt.label}
+              style={[styles.pill, selected === opt.label && styles.pillSelected]}
+              onPress={() => handleSelect(opt.value, opt.label)}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.pillText, selected === opt.label && styles.pillTextSelected]}>
+                {opt.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
-  back: { paddingTop: 56, paddingHorizontal: Spacing.md },
-  content: { flex: 1, paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl },
-  step: {
-    color: Colors.accentOrange,
-    fontSize: Typography.sm,
-    fontWeight: FontWeight.semibold,
-    letterSpacing: 1,
-    marginBottom: Spacing.sm,
+  container: {
+    flex: 1,
+    backgroundColor: Colors.base,
+  },
+  back: {
+    position: 'absolute',
+    top: 52,
+    left: Spacing.lg,
+    zIndex: 10,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: Spacing.xl,
   },
   heading: {
-    color: Colors.textPrimary,
-    fontSize: Typography.xl,
-    fontWeight: FontWeight.extrabold,
-    marginBottom: Spacing.sm,
+    color: '#FFFFFF',
+    fontSize: Typography.xxl,
+    fontWeight: FontWeight.bold,
+    textAlign: 'center',
+    marginBottom: Spacing.xs,
   },
   sub: {
-    color: Colors.textSecondary,
+    color: 'rgba(255,255,255,0.5)',
     fontSize: Typography.sm,
+    textAlign: 'center',
     marginBottom: Spacing.xl,
   },
-  footer: { padding: Spacing.lg, paddingBottom: 40 },
+  grid: {
+    width: '100%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing.sm,
+  },
+  pill: {
+    width: '47%',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: Radii.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    paddingVertical: 18,
+    alignItems: 'center',
+  },
+  pillSelected: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderColor: 'rgba(255,255,255,0.4)',
+  },
+  pillText: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: Typography.base,
+    fontWeight: FontWeight.medium,
+  },
+  pillTextSelected: {
+    color: '#FFFFFF',
+    fontWeight: FontWeight.semibold,
+  },
 });
