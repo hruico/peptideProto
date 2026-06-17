@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, ChevronRight, Bell, MessageSquare, HeartPulse, HelpCircle, FileText, RotateCcw } from 'lucide-react-native';
@@ -14,6 +14,7 @@ export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const [weightUnit, setWeightUnit] = useState<'LB' | 'KG'>('LB');
   const [practitionerMode, setPractitionerMode] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
 
   const { resetOnboarding } = useOnboardingStore();
   const { signOut } = useUserStore();
@@ -21,27 +22,31 @@ export default function SettingsScreen() {
   const { clearActivityLog, removeProtocol, myProtocols } = useProtocolStore();
   const { sessions, removeSession } = useTrackingStore();
 
+  function doReset() {
+    clearAll();
+    clearActivityLog();
+    // snapshot the arrays first so forEach doesn't mutate mid-loop
+    [...myProtocols].forEach(p => removeProtocol(p.id));
+    [...sessions].forEach(s => removeSession(s.id));
+    signOut();
+    resetOnboarding();
+    router.replace('/onboarding/splash' as any);
+  }
+
   function handleResetDemo() {
-    Alert.alert(
-      'Reset for Demo',
-      'This will clear all data and restart onboarding from the splash screen. Use this before recording your demo.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Reset & Restart',
-          style: 'destructive',
-          onPress: () => {
-            clearAll();
-            clearActivityLog();
-            myProtocols.forEach(p => removeProtocol(p.id));
-            sessions.forEach(s => removeSession(s.id));
-            signOut();
-            resetOnboarding();
-            router.replace('/onboarding/splash' as any);
-          },
-        },
-      ]
-    );
+    if (Platform.OS === 'web') {
+      // Alert.alert is a no-op on web — use inline confirm state instead
+      setConfirmVisible(true);
+    } else {
+      Alert.alert(
+        'Reset for Demo',
+        'This will clear all data and restart onboarding.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Reset & Restart', style: 'destructive', onPress: doReset },
+        ]
+      );
+    }
   }
 
 
@@ -133,17 +138,38 @@ export default function SettingsScreen() {
 
         {/* Demo reset */}
         <View style={[styles.section, { marginTop: Spacing.xl }]}>
-          <TouchableOpacity style={styles.resetRow} onPress={handleResetDemo} activeOpacity={0.8}>
-            <View style={styles.settingLeft}>
-              <View style={styles.resetIcon}>
-                <RotateCcw size={16} color={Colors.accentRed} />
-              </View>
-              <View>
-                <Text style={[styles.settingLabel, { color: Colors.accentRed }]}>Reset for Demo</Text>
-                <Text style={styles.settingDesc}>Clear all data and restart onboarding</Text>
+          {confirmVisible ? (
+            // Web-safe inline confirm (Alert.alert is a no-op on web)
+            <View style={styles.confirmBox}>
+              <Text style={styles.confirmText}>Reset all data and restart onboarding?</Text>
+              <View style={styles.confirmBtns}>
+                <TouchableOpacity
+                  style={styles.confirmCancel}
+                  onPress={() => setConfirmVisible(false)}
+                >
+                  <Text style={styles.confirmCancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.confirmDestroy}
+                  onPress={() => { setConfirmVisible(false); doReset(); }}
+                >
+                  <Text style={styles.confirmDestroyText}>Reset & Restart</Text>
+                </TouchableOpacity>
               </View>
             </View>
-          </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.resetRow} onPress={handleResetDemo} activeOpacity={0.8}>
+              <View style={styles.settingLeft}>
+                <View style={styles.resetIcon}>
+                  <RotateCcw size={16} color={Colors.accentRed} />
+                </View>
+                <View>
+                  <Text style={[styles.settingLabel, { color: Colors.accentRed }]}>Reset for Demo</Text>
+                  <Text style={styles.settingDesc}>Clear all data and restart onboarding</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          )}
         </View>
       </ScrollView>
     </View>
@@ -189,5 +215,28 @@ const styles = StyleSheet.create({
     width: 32, height: 32, borderRadius: 16,
     backgroundColor: 'rgba(231,76,60,0.15)',
     alignItems: 'center', justifyContent: 'center',
+  },
+  confirmBox: {
+    padding: Spacing.md, gap: Spacing.md,
+  },
+  confirmText: {
+    color: Colors.textPrimary, fontSize: Typography.sm, lineHeight: 20,
+  },
+  confirmBtns: {
+    flexDirection: 'row', gap: Spacing.sm,
+  },
+  confirmCancel: {
+    flex: 1, paddingVertical: Spacing.sm, borderRadius: Radii.lg,
+    backgroundColor: Colors.surfaceBorder, alignItems: 'center',
+  },
+  confirmCancelText: {
+    color: Colors.textSecondary, fontSize: Typography.sm, fontWeight: FontWeight.medium,
+  },
+  confirmDestroy: {
+    flex: 1, paddingVertical: Spacing.sm, borderRadius: Radii.lg,
+    backgroundColor: Colors.accentRed, alignItems: 'center',
+  },
+  confirmDestroyText: {
+    color: '#fff', fontSize: Typography.sm, fontWeight: FontWeight.bold,
   },
 });
