@@ -293,11 +293,12 @@ const styles = StyleSheet.create({
   scheduleDose: { fontSize: Typography.xs, color: Colors.textSecondary, marginTop: 2 },
   scheduleTiming: { fontSize: Typography.xs, color: Colors.textTertiary },
   cautionCard: {
-    backgroundColor: '#FFF8ED', borderRadius: Radii.lg, padding: Spacing.md,
-    borderWidth: 1, borderColor: '#FFE0A0', gap: Spacing.sm,
+    backgroundColor: 'rgba(243,156,18,0.12)',
+    borderRadius: Radii.lg, padding: Spacing.md,
+    borderWidth: 1, borderColor: 'rgba(243,156,18,0.3)', gap: Spacing.sm,
   },
   cautionRow: { flexDirection: 'row', gap: Spacing.sm, alignItems: 'flex-start' },
-  cautionBullet: { fontSize: Typography.sm },
+  cautionBullet: { fontSize: Typography.sm, color: '#F39C12' },
   cautionText: { flex: 1, fontSize: Typography.sm, color: Colors.textPrimary, lineHeight: 20 },
   faqRow: {
     paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
