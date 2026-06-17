@@ -1,15 +1,49 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ChevronLeft, ChevronRight, Bell, MessageSquare, HeartPulse, HelpCircle, FileText } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Bell, MessageSquare, HeartPulse, HelpCircle, FileText, RotateCcw } from 'lucide-react-native';
 import { useState } from 'react';
 import { useUserStore } from '../../store/useUserStore';
+import { useOnboardingStore } from '../../store/useOnboardingStore';
+import { useScheduleStore } from '../../store/useScheduleStore';
+import { useProtocolStore } from '../../store/useProtocolStore';
+import { useTrackingStore } from '../../store/useTrackingStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
   const [weightUnit, setWeightUnit] = useState<'LB' | 'KG'>('LB');
   const [practitionerMode, setPractitionerMode] = useState(false);
+
+  const { resetOnboarding } = useOnboardingStore();
+  const { signOut } = useUserStore();
+  const { clearAll } = useScheduleStore();
+  const { clearActivityLog, removeProtocol, myProtocols } = useProtocolStore();
+  const { sessions, removeSession } = useTrackingStore();
+
+  function handleResetDemo() {
+    Alert.alert(
+      'Reset for Demo',
+      'This will clear all data and restart onboarding from the splash screen. Use this before recording your demo.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset & Restart',
+          style: 'destructive',
+          onPress: () => {
+            clearAll();
+            clearActivityLog();
+            myProtocols.forEach(p => removeProtocol(p.id));
+            sessions.forEach(s => removeSession(s.id));
+            signOut();
+            resetOnboarding();
+            router.replace('/onboarding/splash' as any);
+          },
+        },
+      ]
+    );
+  }
+
 
   return (
     <View style={styles.container}>
@@ -96,6 +130,21 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* Demo reset */}
+        <View style={[styles.section, { marginTop: Spacing.xl }]}>
+          <TouchableOpacity style={styles.resetRow} onPress={handleResetDemo} activeOpacity={0.8}>
+            <View style={styles.settingLeft}>
+              <View style={styles.resetIcon}>
+                <RotateCcw size={16} color={Colors.accentRed} />
+              </View>
+              <View>
+                <Text style={[styles.settingLabel, { color: Colors.accentRed }]}>Reset for Demo</Text>
+                <Text style={styles.settingDesc}>Clear all data and restart onboarding</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
@@ -132,4 +181,13 @@ const styles = StyleSheet.create({
   segBtnActive: { backgroundColor: Colors.primaryOrange },
   segBtnText: { fontSize: Typography.sm, color: Colors.textSecondary, fontWeight: FontWeight.medium },
   segBtnTextActive: { color: '#fff', fontWeight: FontWeight.bold },
+  resetRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md, paddingVertical: Spacing.md,
+  },
+  resetIcon: {
+    width: 32, height: 32, borderRadius: 16,
+    backgroundColor: 'rgba(231,76,60,0.15)',
+    alignItems: 'center', justifyContent: 'center',
+  },
 });
