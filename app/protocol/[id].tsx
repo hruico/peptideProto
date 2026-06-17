@@ -1,247 +1,317 @@
 import {
-  View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, Alert,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
-import { X, Clock, Users, ChevronRight, FlaskConical } from 'lucide-react-native';
+import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { ChevronLeft, X, Users, Clock, Zap, DollarSign, ChevronRight, ChevronDown } from 'lucide-react-native';
+import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
-import GradientButton from '../../components/ui/GradientButton';
 import { getProtocolById } from '../../data/protocols';
 import { getPeptideById } from '../../data/peptides';
 import { useProtocolStore } from '../../store/useProtocolStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
-// Distinct hero gradient per protocol
-const HERO_GRADIENTS: Record<string, readonly [string, string]> = {
-  'injury-recovery-stack': ['#1A3A2A', '#0D2A1A'],
-  'gh-optimizer':          ['#2A1A3A', '#1A0D2A'],
-  'cognitive-edge':        ['#1A2A3A', '#0D1A2A'],
-  'longevity-protocol':    ['#1A2A3A', '#0D1A2A'],
-  'body-recomp':           ['#3A2A1A', '#2A1A0D'],
-  'elite-recovery':        ['#3A1A1A', '#2A0D0D'],
-  'gut-reset':             ['#1A3A2A', '#0D2A1A'],
-};
-
 export default function ProtocolDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const protocol = getProtocolById(id);
-  const { startProtocol, logActivity, myProtocols } = useProtocolStore();
+  const { startProtocol } = useProtocolStore();
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
-  if (!protocol) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>Protocol not found.</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backLink}>Go back</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
+  if (!protocol) return (
+    <View style={styles.container}>
+      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+        <ChevronLeft size={22} color={Colors.textPrimary} />
+      </TouchableOpacity>
+      <Text style={styles.notFound}>Protocol not found</Text>
+    </View>
+  );
 
-  const isAlreadyStarted = myProtocols.some((p) => p.id === protocol.id);
-  const heroColors = HERO_GRADIENTS[protocol.id] ?? ['#1A2A3A', '#0D1A2A'];
-
-  function handleStart() {
-    if (isAlreadyStarted) {
-      Alert.alert('Already active', `${protocol!.name} is already in your protocols.`);
-      return;
-    }
-    startProtocol(protocol!);
-    logActivity({
-      id: Date.now().toString(),
-      date: new Date().toISOString(),
-      type: 'protocol_started',
-      title: `Started: ${protocol!.name}`,
-      subtitle: protocol!.durationLabel,
-      relatedId: protocol!.id,
-    });
-    Alert.alert('Protocol Started! 🚀', `${protocol!.name} has been added to My Protocols.`, [
-      { text: 'View My Protocols', onPress: () => { router.back(); router.push('/account/my-protocols'); } },
-      { text: 'OK', onPress: () => router.back() },
-    ]);
-  }
+  const difficulty = (protocol as any).difficulty ?? 'Intermediate';
+  const frequencyLabel = (protocol as any).frequencyLabel ?? 'Daily';
+  const estimatedWeeklyCost = (protocol as any).estimatedWeeklyCost ?? '~$80/wk';
+  const whoIsThisFor: string[] = (protocol as any).whoIsThisFor ?? [
+    'Adults aged 25–65 looking for results', 'People who have tried other approaches',
+    'Committed to a 8+ week protocol',
+  ];
+  const importantToKnow: string[] = (protocol as any).importantToKnow ?? [
+    'Medical supervision recommended', 'Sourcing and sterility matter',
+    'Do not use if pregnant or nursing',
+  ];
+  const faq: { question: string; answer: string }[] = (protocol as any).faq ?? [
+    { question: 'How should I store these peptides?', answer: 'Store unreconstituted peptides in the freezer. Once reconstituted, refrigerate and use within 28 days.' },
+    { question: 'Can I stack this with other peptides?', answer: 'Always consult with a healthcare provider before combining peptides.' },
+  ];
 
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
 
-      {/* Close */}
-      <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
-        <X size={20} color="rgba(255,255,255,0.7)" />
-      </TouchableOpacity>
-
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+        {/* Hero */}
+        <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={styles.hero}>
+          <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+            <ChevronLeft size={22} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
+            <X size={18} color="#fff" />
+          </TouchableOpacity>
 
-        {/* Hero gradient */}
-        <LinearGradient colors={heroColors as any} style={styles.hero}>
-          <Text style={styles.heroEmoji}>💉</Text>
-          <View style={styles.heroMeta}>
-            <View style={styles.heroBadge}>
-              <Users size={11} color="rgba(255,255,255,0.7)" />
-              <Text style={styles.heroBadgeText}>{protocol.participantCount.toLocaleString()} on this</Text>
+          <View style={styles.heroContent}>
+            <Text style={styles.heroTitle}>{protocol.name}</Text>
+            <Text style={styles.heroSub}>{protocol.subtitle}</Text>
+            <View style={styles.heroBadgeRow}>
+              <View style={styles.heroBadge}>
+                <Text style={styles.heroBadgeText}>{protocol.peptideIds.length} Peptides</Text>
+              </View>
+              <View style={styles.heroBadge}>
+                <Text style={styles.heroBadgeText}>{protocol.durationLabel}</Text>
+              </View>
+              <View style={styles.heroBadge}>
+                <Users size={10} color="rgba(255,255,255,0.8)" />
+                <Text style={styles.heroBadgeText}>{protocol.participantCount.toLocaleString()} started</Text>
+              </View>
             </View>
           </View>
         </LinearGradient>
 
-        {/* Meta */}
-        <View style={styles.metaRow}>
-          <View style={styles.badge}>
-            <Clock size={11} color="rgba(255,255,255,0.4)" />
-            <Text style={styles.badgeText}>{protocol.durationLabel}</Text>
-          </View>
-          <View style={[styles.badge, styles.badgePurple]}>
-            <Text style={styles.badgePurpleText}>
-              {protocol.category === 'curated-combo' ? 'Curated Combo' : 'Expert Protocol'}
-            </Text>
+        {/* At a Glance */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>AT A GLANCE</Text>
+          <View style={styles.statsGrid}>
+            <StatTile icon={<Zap size={16} color={Colors.primaryOrange} />} label="Difficulty" value={difficulty} />
+            <StatTile icon={<Clock size={16} color={Colors.primaryOrange} />} label="Duration" value={protocol.durationLabel} />
+            <StatTile icon={<Clock size={16} color={Colors.primaryOrange} />} label="Frequency" value={frequencyLabel} />
+            <StatTile icon={<DollarSign size={16} color={Colors.primaryOrange} />} label="Est. Cost" value={estimatedWeeklyCost} />
           </View>
         </View>
 
-        <Text style={styles.name}>{protocol.name}</Text>
-        <Text style={styles.subtitle}>{protocol.subtitle}</Text>
-
-        {/* Tags */}
-        <View style={styles.tagsRow}>
-          {protocol.tags.map((tag) => (
-            <View key={tag} style={styles.tag}>
-              <Text style={styles.tagText}>{tag}</Text>
+        {/* Who is this for */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>WHO IS THIS FOR?</Text>
+          {whoIsThisFor.map((item, i) => (
+            <View key={i} style={styles.bulletRow}>
+              <View style={styles.bullet} />
+              <Text style={styles.bulletText}>{item}</Text>
             </View>
           ))}
         </View>
 
-        {/* Schedule — each row taps to peptide detail */}
-        <Text style={styles.sectionTitle}>Protocol Schedule</Text>
-        {protocol.schedule.map((entry, i) => {
-          const peptide = getPeptideById(entry.peptideId);
-          return (
+        {/* Why this stack */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>WHY THIS STACK?</Text>
+          {protocol.peptideIds.map((pid) => {
+            const peptide = getPeptideById(pid);
+            if (!peptide) return null;
+            return (
+              <TouchableOpacity
+                key={pid}
+                style={styles.peptideRow}
+                onPress={() => router.push({ pathname: '/peptide/[id]', params: { id: pid } })}
+                activeOpacity={0.7}
+              >
+                <View style={[styles.peptideAvatar, { backgroundColor: getCategoryColor(peptide.category) }]}>
+                  <Text style={styles.peptideAvatarLetter}>{peptide.name[0]}</Text>
+                </View>
+                <View style={styles.peptideInfo}>
+                  <Text style={styles.peptideName}>{peptide.name}</Text>
+                  <Text style={styles.peptideRole}>{peptide.category.toUpperCase()}</Text>
+                  <Text style={styles.peptideDesc} numberOfLines={1}>{peptide.description}</Text>
+                </View>
+                <ChevronRight size={16} color={Colors.textTertiary} />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Schedule */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>DOSING SCHEDULE</Text>
+          {protocol.schedule.map((entry, i) => {
+            const peptide = getPeptideById(entry.peptideId);
+            return (
+              <View key={i} style={styles.scheduleRow}>
+                <View style={[styles.scheduleAvatar, { backgroundColor: peptide ? getCategoryColor(peptide.category) : '#999' }]}>
+                  <Text style={styles.peptideAvatarLetter}>{peptide?.name[0] ?? '?'}</Text>
+                </View>
+                <View style={styles.scheduleInfo}>
+                  <Text style={styles.scheduleName}>{peptide?.name ?? entry.peptideId}</Text>
+                  <Text style={styles.scheduleDose}>{entry.dose} {entry.unit} · {entry.frequency}</Text>
+                  {entry.timing && <Text style={styles.scheduleTiming}>{entry.timing}</Text>}
+                </View>
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Important to know */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>IMPORTANT TO KNOW</Text>
+          <View style={styles.cautionCard}>
+            {importantToKnow.map((item, i) => (
+              <View key={i} style={styles.cautionRow}>
+                <Text style={styles.cautionBullet}>⚠</Text>
+                <Text style={styles.cautionText}>{item}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* FAQ */}
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>COMMON QUESTIONS</Text>
+          {faq.map((item, i) => (
             <TouchableOpacity
               key={i}
-              style={styles.scheduleRow}
-              onPress={() => peptide && router.push(`/peptide/${peptide.id}`)}
-              activeOpacity={0.8}
+              style={styles.faqRow}
+              onPress={() => setExpandedFaq(expandedFaq === i ? null : i)}
+              activeOpacity={0.7}
             >
-              <View style={styles.scheduleIcon}>
-                <FlaskConical size={14} color={Colors.accentOrange} />
-              </View>
-              <View style={styles.scheduleLeft}>
-                <Text style={styles.scheduleName}>
-                  {peptide?.name ?? entry.peptideId}
-                </Text>
-                <Text style={styles.scheduleDose}>
-                  {entry.dose} {entry.unit} · {entry.frequency}
-                  {entry.timing ? ` · ${entry.timing}` : ''}
-                </Text>
-              </View>
-              <ChevronRight size={14} color="rgba(255,255,255,0.25)" />
+              <Text style={styles.faqQuestion}>{item.question}</Text>
+              <ChevronDown
+                size={16} color={Colors.textTertiary}
+                style={{ transform: [{ rotate: expandedFaq === i ? '180deg' : '0deg' }] }}
+              />
+              {expandedFaq === i && (
+                <Text style={styles.faqAnswer}>{item.answer}</Text>
+              )}
             </TouchableOpacity>
-          );
-        })}
+          ))}
+        </View>
+
+        <View style={{ height: 120 }} />
       </ScrollView>
 
-      <View style={styles.footer}>
-        <GradientButton
-          label={isAlreadyStarted ? '✓ Already in My Protocols' : 'Start Protocol'}
-          onPress={handleStart}
-          variant={isAlreadyStarted ? 'secondary' : 'primary-orange'}
-        />
+      {/* Sticky CTA */}
+      <View style={styles.stickyFooter}>
+        <TouchableOpacity
+          style={styles.startBtn}
+          onPress={() => {
+            startProtocol(protocol);
+            router.back();
+          }}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.startBtnText}>Start Protocol</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
 
+function StatTile({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <View style={statStyles.tile}>
+      {icon}
+      <Text style={statStyles.label}>{label}</Text>
+      <Text style={statStyles.value}>{value}</Text>
+    </View>
+  );
+}
+
+function getCategoryColor(cat: string): string {
+  const map: Record<string, string> = {
+    'Recovery & Healing': '#EF4444',
+    'Fat Loss': '#F97316',
+    'Muscle & Performance': '#3B82F6',
+    'Cognitive & Neuroprotection': '#8B5CF6',
+    'Sleep & Longevity': '#6366F1',
+    'Skin & Aesthetics': '#EC4899',
+    'GI & Gut Health': '#22C55E',
+  };
+  return map[cat] ?? '#999';
+}
+
+const statStyles = StyleSheet.create({
+  tile: {
+    flex: 1, minWidth: '45%', backgroundColor: Colors.surface,
+    borderRadius: Radii.lg, padding: Spacing.md, gap: 4,
+    alignItems: 'flex-start',
+  },
+  label: { fontSize: Typography.xs, color: Colors.textTertiary, fontWeight: FontWeight.medium },
+  value: { fontSize: Typography.base, color: Colors.textPrimary, fontWeight: FontWeight.bold },
+});
+
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.base },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.base },
-  errorText: { color: 'rgba(255,255,255,0.5)', fontSize: Typography.base },
-  backLink: { color: Colors.accentOrange, marginTop: Spacing.md },
+  notFound: { textAlign: 'center', marginTop: 100, color: Colors.textSecondary },
+  scroll: { paddingBottom: 40 },
+  hero: { paddingTop: 56, paddingBottom: Spacing.xl, paddingHorizontal: Spacing.lg },
+  backBtn: {
+    position: 'absolute', top: 52, left: Spacing.lg, zIndex: 10,
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center',
+  },
   closeBtn: {
     position: 'absolute', top: 52, right: Spacing.lg, zIndex: 10,
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center',
   },
-  scroll: { paddingBottom: 32 },
-  hero: {
-    height: 240,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  heroEmoji: { fontSize: 64 },
-  heroMeta: {
-    position: 'absolute',
-    top: Spacing.lg + 52,
-    right: Spacing.lg,
-  },
+  heroContent: { paddingTop: 44 },
+  heroTitle: { color: '#fff', fontSize: Typography.xxl, fontWeight: FontWeight.extrabold, marginBottom: 6 },
+  heroSub: { color: 'rgba(255,255,255,0.65)', fontSize: Typography.sm, marginBottom: Spacing.lg },
+  heroBadgeRow: { flexDirection: 'row', gap: Spacing.sm, flexWrap: 'wrap' },
   heroBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    borderRadius: Radii.full,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 4,
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: Radii.full,
+    paddingHorizontal: Spacing.sm, paddingVertical: 4,
   },
-  heroBadgeText: { color: 'rgba(255,255,255,0.8)', fontSize: Typography.xs },
-  metaRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing.sm,
-    paddingHorizontal: Spacing.lg,
-    marginTop: Spacing.lg,
+  heroBadgeText: { color: 'rgba(255,255,255,0.85)', fontSize: Typography.xs, fontWeight: FontWeight.medium },
+  section: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl },
+  sectionLabel: {
+    fontSize: Typography.xs, color: Colors.textTertiary, fontWeight: FontWeight.semibold,
+    letterSpacing: 1.5, marginBottom: Spacing.md,
   },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: Radii.full,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 4,
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
+  statsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+  bulletRow: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.sm, alignItems: 'flex-start' },
+  bullet: {
+    width: 6, height: 6, borderRadius: 3,
+    backgroundColor: Colors.primaryOrange, marginTop: 7,
   },
-  badgeText: { color: 'rgba(255,255,255,0.4)', fontSize: Typography.xs },
-  badgePurple: { backgroundColor: 'rgba(123,79,255,0.15)', borderColor: 'rgba(123,79,255,0.3)' },
-  badgePurpleText: { color: Colors.accentViolet, fontSize: Typography.xs, fontWeight: FontWeight.semibold },
-  name: {
-    color: '#FFF', fontSize: Typography.xxl, fontWeight: FontWeight.extrabold,
-    paddingHorizontal: Spacing.lg, marginTop: Spacing.md,
+  bulletText: { flex: 1, fontSize: Typography.sm, color: Colors.textPrimary, lineHeight: 20 },
+  peptideRow: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
+    backgroundColor: Colors.surface, borderRadius: Radii.lg, padding: Spacing.md,
+    marginBottom: Spacing.sm, borderWidth: 1, borderColor: Colors.surfaceBorder,
   },
-  subtitle: {
-    color: 'rgba(255,255,255,0.5)', fontSize: Typography.sm,
-    paddingHorizontal: Spacing.lg, marginTop: 4, marginBottom: Spacing.md,
-  },
-  tagsRow: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.xs,
-    paddingHorizontal: Spacing.lg, marginBottom: Spacing.xl,
-  },
-  tag: {
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: Radii.full,
-    paddingHorizontal: Spacing.sm, paddingVertical: 3,
-    borderWidth: 1, borderColor: Colors.surfaceBorder,
-  },
-  tagText: { color: 'rgba(255,255,255,0.35)', fontSize: Typography.xs },
-  sectionTitle: {
-    color: '#FFF', fontSize: Typography.md, fontWeight: FontWeight.bold,
-    paddingHorizontal: Spacing.lg, marginBottom: Spacing.md,
-  },
-  scheduleRow: {
-    flexDirection: 'row', alignItems: 'center',
-    backgroundColor: Colors.surfaceElevated,
-    marginHorizontal: Spacing.lg, borderRadius: Radii.lg,
-    padding: Spacing.md, marginBottom: Spacing.sm,
-    borderWidth: 1, borderColor: Colors.surfaceBorder,
-    gap: Spacing.sm,
-  },
-  scheduleIcon: {
-    width: 30, height: 30, borderRadius: 8,
-    backgroundColor: 'rgba(255,107,43,0.1)',
+  peptideAvatar: {
+    width: 40, height: 40, borderRadius: 20,
     alignItems: 'center', justifyContent: 'center',
   },
-  scheduleLeft: { flex: 1 },
-  scheduleName: { color: '#FFF', fontSize: Typography.base, fontWeight: FontWeight.semibold },
-  scheduleDose: { color: 'rgba(255,255,255,0.4)', fontSize: Typography.xs, marginTop: 2 },
-  footer: { padding: Spacing.lg, paddingBottom: 40 },
+  peptideAvatarLetter: { color: '#fff', fontSize: Typography.md, fontWeight: FontWeight.bold },
+  peptideInfo: { flex: 1 },
+  peptideName: { fontSize: Typography.base, fontWeight: FontWeight.bold, color: Colors.textPrimary },
+  peptideRole: { fontSize: Typography.xs, color: Colors.primaryOrange, fontWeight: FontWeight.semibold, letterSpacing: 0.8 },
+  peptideDesc: { fontSize: Typography.xs, color: Colors.textSecondary, marginTop: 2 },
+  scheduleRow: {
+    flexDirection: 'row', gap: Spacing.md, alignItems: 'center',
+    paddingVertical: Spacing.sm, borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
+  },
+  scheduleAvatar: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  scheduleInfo: { flex: 1 },
+  scheduleName: { fontSize: Typography.base, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
+  scheduleDose: { fontSize: Typography.xs, color: Colors.textSecondary, marginTop: 2 },
+  scheduleTiming: { fontSize: Typography.xs, color: Colors.textTertiary },
+  cautionCard: {
+    backgroundColor: '#FFF8ED', borderRadius: Radii.lg, padding: Spacing.md,
+    borderWidth: 1, borderColor: '#FFE0A0', gap: Spacing.sm,
+  },
+  cautionRow: { flexDirection: 'row', gap: Spacing.sm, alignItems: 'flex-start' },
+  cautionBullet: { fontSize: Typography.sm },
+  cautionText: { flex: 1, fontSize: Typography.sm, color: Colors.textPrimary, lineHeight: 20 },
+  faqRow: {
+    paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
+    flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: 8,
+  },
+  faqQuestion: { flex: 1, fontSize: Typography.base, color: Colors.textPrimary, fontWeight: FontWeight.medium },
+  faqAnswer: { width: '100%', fontSize: Typography.sm, color: Colors.textSecondary, marginTop: 8, lineHeight: 20 },
+  stickyFooter: {
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    padding: Spacing.lg, paddingBottom: 36, backgroundColor: Colors.base,
+    borderTopWidth: 1, borderTopColor: Colors.surfaceBorder,
+  },
+  startBtn: {
+    backgroundColor: Colors.primaryOrange, borderRadius: 32, paddingVertical: 18, alignItems: 'center',
+  },
+  startBtnText: { color: '#fff', fontSize: Typography.base, fontWeight: FontWeight.bold },
 });

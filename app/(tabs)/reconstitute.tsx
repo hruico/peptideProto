@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Layers } from 'lucide-react-native';
 import { useVialStore } from '../../store/useVialStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 import type { Vial } from '../../types';
@@ -11,7 +10,7 @@ export default function ReconstituteScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {/* Vial illustration */}
@@ -60,17 +59,6 @@ export default function ReconstituteScreen() {
           >
             <Text style={styles.secondaryBtnText}>Add Pre-Mixed Solution</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.secondaryBtn}
-            onPress={() => router.push('/reconstitute/add-blend')}
-            activeOpacity={0.85}
-          >
-            <View style={styles.blendBtnInner}>
-              <Layers size={16} color="rgba(255,255,255,0.7)" />
-              <Text style={styles.secondaryBtnText}>Add Blend</Text>
-            </View>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -95,7 +83,7 @@ const vialStyles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: Colors.surface,
     borderRadius: Radii.lg,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
@@ -103,14 +91,14 @@ const vialStyles = StyleSheet.create({
     borderColor: Colors.surfaceBorder,
   },
   left: { flex: 1 },
-  name: { color: '#FFF', fontSize: Typography.base, fontWeight: FontWeight.semibold },
-  conc: { color: Colors.accentOrange, fontSize: Typography.xs, marginTop: 2 },
-  type: { color: 'rgba(255,255,255,0.4)', fontSize: Typography.xs, textTransform: 'capitalize' },
+  name: { color: Colors.textPrimary, fontSize: Typography.base, fontWeight: FontWeight.semibold },
+  conc: { color: Colors.primaryOrange, fontSize: Typography.xs, marginTop: 2 },
+  type: { color: Colors.textTertiary, fontSize: Typography.xs, textTransform: 'capitalize' },
 });
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.base },
-  scroll: { paddingBottom: 48 },
+  scroll: { paddingBottom: 100 },
   heroSection: {
     alignItems: 'center',
     paddingTop: 80,
@@ -119,7 +107,7 @@ const styles = StyleSheet.create({
   vialImage: {
     width: 120,
     height: 120,
-    tintColor: Colors.accentOrange,
+    tintColor: Colors.primaryOrange,
   },
   textSection: {
     alignItems: 'center',
@@ -128,14 +116,14 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   title: {
-    color: '#FFFFFF',
+    color: Colors.textPrimary,
     fontSize: Typography.xxl,
     fontWeight: FontWeight.extrabold,
     textAlign: 'center',
     lineHeight: 36,
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.5)',
+    color: Colors.textSecondary,
     fontSize: Typography.sm,
     textAlign: 'center',
     lineHeight: 22,
@@ -145,7 +133,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
   },
   sectionLabel: {
-    color: 'rgba(255,255,255,0.4)',
+    color: Colors.textTertiary,
     fontSize: Typography.xs,
     fontWeight: FontWeight.semibold,
     letterSpacing: 1.5,
@@ -156,7 +144,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   primaryBtn: {
-    backgroundColor: Colors.accentOrange,
+    backgroundColor: Colors.primaryOrange,
     borderRadius: 32,
     paddingVertical: 18,
     alignItems: 'center',
@@ -167,7 +155,7 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
   },
   secondaryBtn: {
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: Colors.surface,
     borderRadius: 32,
     paddingVertical: 18,
     alignItems: 'center',
@@ -175,13 +163,8 @@ const styles = StyleSheet.create({
     borderColor: Colors.surfaceBorder,
   },
   secondaryBtnText: {
-    color: 'rgba(255,255,255,0.75)',
+    color: Colors.textPrimary,
     fontSize: Typography.base,
     fontWeight: FontWeight.medium,
-  },
-  blendBtnInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.xs,
   },
 });

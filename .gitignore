@@ -14,6 +14,7 @@ yarn-error.*
 
 # Dev docs not meant for repo
 peptide-app-implementation-plan.md
+peptide-app-updated-implementation-plan.md
 
 # OS
 .DS_Store

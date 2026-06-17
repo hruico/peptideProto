@@ -34,7 +34,7 @@ export default function SplashScreen() {
       {/* Deep space gradient background */}
       <LinearGradient
         colors={['#0D1B2A', '#1B2A4A', '#2A3A6A', '#1A2040']}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
       />

@@ -1,82 +1,105 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
-import { X, Activity, FlaskConical, Play } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
-import { format, isToday, isYesterday } from 'date-fns';
+import { X } from 'lucide-react-native';
+import { format } from 'date-fns';
+import { useScheduleStore } from '../../store/useScheduleStore';
 import { useProtocolStore } from '../../store/useProtocolStore';
+import { getPeptideById } from '../../data/peptides';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
-import type { ActivityLogEntry } from '../../types';
-
-const TYPE_CONFIG = {
-  protocol_started: { icon: Play,         color: Colors.accentViolet, bg: 'rgba(123,79,255,0.12)' },
-  vial_saved:       { icon: FlaskConical,  color: Colors.accentOrange, bg: 'rgba(255,107,43,0.12)' },
-  dose_logged:      { icon: Activity,      color: '#4ADE80',           bg: 'rgba(74,222,128,0.12)' },
-};
-
-function groupByDate(entries: ActivityLogEntry[]) {
-  const map = new Map<string, ActivityLogEntry[]>();
-  entries.forEach((e) => {
-    const d = new Date(e.date);
-    const key = isToday(d) ? 'Today' : isYesterday(d) ? 'Yesterday' : format(d, 'MMM d, yyyy');
-    const arr = map.get(key) ?? [];
-    arr.push(e);
-    map.set(key, arr);
-  });
-  return Array.from(map.entries());
-}
 
 export default function StatsScreen() {
-  const { activityLog } = useProtocolStore();
-  const grouped = groupByDate(activityLog);
+  const { scheduledPeptides } = useScheduleStore();
+  const { myProtocols, activityLog } = useProtocolStore();
+
+  const hasActivity = scheduledPeptides.length > 0 || myProtocols.length > 0 || activityLog.length > 0;
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
       <View style={styles.header}>
         <Text style={styles.title}>Stats & Activity</Text>
-        <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
-          <X size={18} color="rgba(255,255,255,0.6)" />
+        <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn}>
+          <X size={20} color={Colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        <Text style={styles.sectionTitle}>Activity History</Text>
-        <Text style={styles.sectionSub}>Your protocol and peptide schedule history</Text>
-
-        {activityLog.length === 0 ? (
-          <View style={styles.emptyBox}>
-            <Text style={styles.emptyText}>No activity started yet</Text>
-            <Text style={styles.emptySubText}>
-              Start a protocol or schedule a peptide to see it here
-            </Text>
+        {!hasActivity ? (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyEmoji}>📊</Text>
+            <Text style={styles.emptyTitle}>No activity yet</Text>
+            <Text style={styles.emptySub}>Start a protocol or add a peptide to see your history here.</Text>
           </View>
         ) : (
-          grouped.map(([dateLabel, entries]) => (
-            <View key={dateLabel} style={styles.group}>
-              <Text style={styles.dateLabel}>{dateLabel}</Text>
-              {entries.map((entry) => {
-                const config = TYPE_CONFIG[entry.type] ?? TYPE_CONFIG.dose_logged;
-                const Icon = config.icon;
-                return (
-                  <View key={entry.id} style={styles.entryRow}>
-                    <View style={[styles.entryIcon, { backgroundColor: config.bg }]}>
-                      <Icon size={15} color={config.color} />
+          <>
+            {/* Active peptides */}
+            {scheduledPeptides.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>ACTIVE</Text>
+                {scheduledPeptides.map((sp) => {
+                  const peptide = getPeptideById(sp.peptideId);
+                  const endDate = sp.runIndefinitely ? null : sp.endDate;
+                  return (
+                    <TouchableOpacity
+                      key={sp.id}
+                      style={styles.activityRow}
+                      onPress={() => router.push({ pathname: '/peptide/[id]', params: { id: sp.peptideId } })}
+                      activeOpacity={0.7}
+                    >
+                      <View style={[styles.activityDot, { backgroundColor: Colors.accentGreen }]} />
+                      <View style={styles.activityInfo}>
+                        <Text style={styles.activityTitle}>{peptide?.name ?? sp.peptideId}</Text>
+                        <Text style={styles.activityDate}>
+                          {format(new Date(sp.startDate), 'MMM d')} – {endDate ? format(new Date(endDate), 'MMM d') : 'Indefinitely'}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            )}
+
+            {/* Active protocols */}
+            {myProtocols.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>PROTOCOLS</Text>
+                {myProtocols.map((proto) => (
+                  <TouchableOpacity
+                    key={proto.id}
+                    style={styles.activityRow}
+                    onPress={() => router.push({ pathname: '/protocol/[id]', params: { id: proto.id } })}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[styles.activityDot, { backgroundColor: Colors.primaryOrange }]} />
+                    <View style={styles.activityInfo}>
+                      <Text style={styles.activityTitle}>{proto.name}</Text>
+                      <Text style={styles.activityDate}>
+                        Started {format(new Date(proto.startedAt), 'MMM d, yyyy')}
+                      </Text>
                     </View>
-                    <View style={styles.entryText}>
-                      <Text style={styles.entryTitle}>{entry.title}</Text>
-                      {entry.subtitle && (
-                        <Text style={styles.entrySub}>{entry.subtitle}</Text>
-                      )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {/* Activity log */}
+            {activityLog.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>HISTORY</Text>
+                {activityLog.slice(0, 20).map((entry) => (
+                  <View key={entry.id} style={styles.logRow}>
+                    <View style={styles.logInfo}>
+                      <Text style={styles.logTitle}>{entry.title}</Text>
+                      {entry.subtitle && <Text style={styles.logSub}>{entry.subtitle}</Text>}
                     </View>
-                    <Text style={styles.entryTime}>
-                      {format(new Date(entry.date), 'HH:mm')}
-                    </Text>
+                    <Text style={styles.logDate}>{format(new Date(entry.date), 'MMM d')}</Text>
                   </View>
-                );
-              })}
-            </View>
-          ))
+                ))}
+              </View>
+            )}
+          </>
         )}
       </ScrollView>
     </View>
@@ -86,75 +109,36 @@ export default function StatsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.base },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 56,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg, paddingTop: 52, paddingBottom: Spacing.md,
+    borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
   },
-  title: { color: '#FFF', fontSize: Typography.xl, fontWeight: FontWeight.extrabold },
-  closeBtn: {
-    width: 34, height: 34, borderRadius: 17,
-    backgroundColor: Colors.surfaceElevated,
-    alignItems: 'center', justifyContent: 'center',
+  title: { fontSize: Typography.xl, fontWeight: FontWeight.extrabold, color: Colors.textPrimary },
+  closeBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center' },
+  scroll: { paddingBottom: 48 },
+  emptyState: { alignItems: 'center', paddingTop: 80, paddingHorizontal: Spacing.xl },
+  emptyEmoji: { fontSize: 60, marginBottom: Spacing.lg },
+  emptyTitle: { fontSize: Typography.xl, fontWeight: FontWeight.bold, color: Colors.textPrimary, marginBottom: Spacing.sm },
+  emptySub: { fontSize: Typography.sm, color: Colors.textSecondary, textAlign: 'center', lineHeight: 22 },
+  section: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.xl },
+  sectionLabel: {
+    fontSize: Typography.xs, color: Colors.textTertiary, fontWeight: FontWeight.semibold,
+    letterSpacing: 1.5, marginBottom: Spacing.md,
   },
-  scroll: { paddingHorizontal: Spacing.lg, paddingBottom: 48 },
-  sectionTitle: {
-    color: '#FFF',
-    fontSize: Typography.lg,
-    fontWeight: FontWeight.bold,
-    marginBottom: 4,
+  activityRow: {
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
+    paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
   },
-  sectionSub: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: Typography.sm,
-    marginBottom: Spacing.lg,
+  activityDot: { width: 10, height: 10, borderRadius: 5 },
+  activityInfo: { flex: 1 },
+  activityTitle: { fontSize: Typography.base, fontWeight: FontWeight.semibold, color: Colors.textPrimary },
+  activityDate: { fontSize: Typography.xs, color: Colors.textSecondary, marginTop: 2 },
+  logRow: {
+    flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between',
+    paddingVertical: Spacing.sm, borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
   },
-  emptyBox: {
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: Radii.lg,
-    padding: Spacing.xl,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
-    gap: Spacing.sm,
-  },
-  emptyText: {
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: Typography.base,
-    fontWeight: FontWeight.medium,
-  },
-  emptySubText: {
-    color: 'rgba(255,255,255,0.3)',
-    fontSize: Typography.sm,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  group: { marginBottom: Spacing.lg },
-  dateLabel: {
-    color: '#FFF',
-    fontSize: Typography.sm,
-    fontWeight: FontWeight.semibold,
-    marginBottom: Spacing.sm,
-  },
-  entryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: Radii.lg,
-    padding: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
-  },
-  entryIcon: {
-    width: 34, height: 34, borderRadius: 9,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  entryText: { flex: 1 },
-  entryTitle: { color: '#FFF', fontSize: Typography.sm, fontWeight: FontWeight.semibold },
-  entrySub: { color: 'rgba(255,255,255,0.4)', fontSize: Typography.xs, marginTop: 2 },
-  entryTime: { color: 'rgba(255,255,255,0.3)', fontSize: Typography.xs },
+  logInfo: { flex: 1 },
+  logTitle: { fontSize: Typography.sm, color: Colors.textPrimary },
+  logSub: { fontSize: Typography.xs, color: Colors.textSecondary, marginTop: 2 },
+  logDate: { fontSize: Typography.xs, color: Colors.textTertiary },
 });

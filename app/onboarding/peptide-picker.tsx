@@ -51,7 +51,7 @@ export default function PeptidePickerScreen() {
 
   function handleContinue(peptideId: string) {
     setInterestedPeptideId(peptideId);
-    router.push({ pathname: '/onboarding/interest-reason', params: { peptideId } });
+    router.push({ pathname: '/onboarding/interest-reason' as any, params: { peptideId } });
   }
 
   return (

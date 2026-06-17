@@ -26,7 +26,7 @@ export default function GoalPickerScreen() {
     setSelected(id);
     setGoal(id);
     setTimeout(() => {
-      router.push({ pathname: '/onboarding/peptide-picker', params: { goalId: id } });
+      router.push({ pathname: '/onboarding/goal-detail' as any, params: { goalId: id } });
     }, 200);
   }
 

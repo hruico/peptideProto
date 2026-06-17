@@ -55,7 +55,7 @@ export default function ExploreScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
       {/* Header */}
       <View style={styles.header}>
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: Colors.surface,
     borderRadius: Radii.lg,
     marginHorizontal: Spacing.lg,
     paddingHorizontal: Spacing.md,
@@ -269,18 +269,18 @@ const styles = StyleSheet.create({
   columnWrapper: { gap: Spacing.md, marginBottom: Spacing.md },
   gridItem: { flex: 1 },
   sectionHeading: {
-    color: '#FFFFFF',
+    color: Colors.textPrimary,
     fontSize: Typography.xxl,
     fontWeight: FontWeight.extrabold,
     marginBottom: 4,
   },
   sectionSub: {
-    color: 'rgba(255,255,255,0.45)',
+    color: Colors.textSecondary,
     fontSize: Typography.sm,
     marginBottom: Spacing.lg,
   },
   sectionLabel: {
-    color: 'rgba(255,255,255,0.4)',
+    color: Colors.textTertiary,
     fontSize: Typography.xs,
     fontWeight: FontWeight.semibold,
     letterSpacing: 1.5,
@@ -289,11 +289,11 @@ const styles = StyleSheet.create({
   // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'flex-end',
   },
   modalSheet: {
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: Colors.base,
     borderTopLeftRadius: Radii.xl,
     borderTopRightRadius: Radii.xl,
     padding: Spacing.lg,

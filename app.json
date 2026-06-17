@@ -40,6 +40,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "44a7b786-2f6f-4d0b-969c-57f738241cdd"
+      }
+    },
+    "owner": "hruico"
   }
 }

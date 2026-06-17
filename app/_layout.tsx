@@ -37,7 +37,6 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const hasCompletedOnboarding = useOnboardingStore((s) => s.hasCompletedOnboarding);
 
-  // Redirect to onboarding on first launch
   useEffect(() => {
     if (!hasCompletedOnboarding) {
       router.replace('/onboarding/splash');
@@ -49,7 +48,7 @@ function RootLayoutNav() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: '#12132A' },
+          contentStyle: { backgroundColor: '#FFFFFF' },
         }}
       >
         <Stack.Screen name="(tabs)" />
@@ -62,6 +61,15 @@ function RootLayoutNav() {
         <Stack.Screen name="reconstitute/new-peptide" options={{ presentation: 'modal' }} />
         <Stack.Screen name="reconstitute/pre-mixed" options={{ presentation: 'modal' }} />
         <Stack.Screen name="reconstitute/add-blend" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="schedule/add-peptide" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="schedule/peptide-added" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="schedule/notifications" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="tracking/intro" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="tracking/select-metrics" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="tracking/duration" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="tracking/baseline" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="peptide/[id]/titration" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="account/settings" options={{ presentation: 'modal' }} />
       </Stack>
     </SafeAreaProvider>
   );
