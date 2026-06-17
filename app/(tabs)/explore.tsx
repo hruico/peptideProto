@@ -104,7 +104,12 @@ export default function ExploreScreen() {
       {/* Protocols tab */}
       {activeTab === 'Protocols' && (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.listContent}>
-          <Text style={styles.sectionHeading}>Curated combos</Text>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionHeading}>Curated combos</Text>
+            <TouchableOpacity onPress={() => router.push('/explore/popular-stacks' as any)}>
+              <Text style={styles.seeAll}>Browse all ›</Text>
+            </TouchableOpacity>
+          </View>
           <Text style={styles.sectionSub}>Ready-made stacks. Pick one and start in minutes.</Text>
           <Text style={styles.sectionLabel}>POPULAR ON THE INTERNET</Text>
           {filteredProtocols
@@ -117,7 +122,12 @@ export default function ExploreScreen() {
                 fullWidth
               />
             ))}
-          <Text style={[styles.sectionLabel, { marginTop: Spacing.lg }]}>FEATURED EXPERT PROTOCOLS</Text>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={[styles.sectionLabel, { marginTop: Spacing.lg, flex: 1 }]}>FEATURED EXPERT PROTOCOLS</Text>
+            <TouchableOpacity onPress={() => router.push('/explore/featured-protocols' as any)}>
+              <Text style={[styles.seeAll, { marginTop: Spacing.lg }]}>Browse all ›</Text>
+            </TouchableOpacity>
+          </View>
           {filteredProtocols
             .filter(p => p.category === 'expert-protocol')
             .map(item => (
@@ -274,7 +284,16 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.extrabold,
     marginBottom: 4,
   },
-  sectionSub: {
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  seeAll: {
+    color: Colors.primaryOrange,
+    fontSize: Typography.sm,
+    fontWeight: FontWeight.semibold,
+  },  sectionSub: {
     color: Colors.textSecondary,
     fontSize: Typography.sm,
     marginBottom: Spacing.lg,

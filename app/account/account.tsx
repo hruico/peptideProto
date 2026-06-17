@@ -15,7 +15,7 @@ export default function AccountScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
       {/* Close */}
       <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
@@ -94,6 +94,16 @@ export default function AccountScreen() {
           activeOpacity={0.8}
         >
           <Text style={styles.menuRowText}>Stats & Activity</Text>
+          <ChevronRight size={16} color="rgba(255,255,255,0.3)" />
+        </TouchableOpacity>
+
+        {/* Settings */}
+        <TouchableOpacity
+          style={styles.menuRow}
+          onPress={() => router.push('/account/settings' as any)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.menuRowText}>Settings</Text>
           <ChevronRight size={16} color="rgba(255,255,255,0.3)" />
         </TouchableOpacity>
       </ScrollView>

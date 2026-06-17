@@ -11,7 +11,7 @@ export default function MyProtocolsScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
 
       <View style={styles.header}>
         <Text style={styles.title}>My Protocols</Text>

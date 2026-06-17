@@ -30,14 +30,14 @@ const OPTIONS = [
     number: '03',
     label: 'Browse protocols',
     description: 'Vetted stacks with dosing and timing.',
-    route: null,
+    route: '/explore/popular-stacks',
   },
   {
     id: 'add-stack',
     number: '04',
     label: 'Add current stack',
     description: 'Log what you take — get a tailored plan.',
-    route: null,
+    route: '/stack-builder',
   },
 ];
 
@@ -55,7 +55,6 @@ export default function GetStartedScreen() {
       router.replace('/(tabs)');
     }
   }
-
   return (
     <View style={styles.container}>
       <StatusBar style="light" />
