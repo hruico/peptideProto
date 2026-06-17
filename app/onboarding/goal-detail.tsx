@@ -16,7 +16,7 @@ export default function GoalDetailScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: detail.bgColor }]}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
         <ChevronLeft size={22} color={Colors.textPrimary} />
@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   emoji: { fontSize: 80 },
   headline: {
     fontSize: Typography.xxl, fontWeight: FontWeight.extrabold,
-    color: Colors.textPrimary, textAlign: 'center', marginBottom: Spacing.xl, lineHeight: 38,
+    color: '#1A1A1A', textAlign: 'center', marginBottom: Spacing.xl, lineHeight: 38,
   },
   benefitsCard: {
     backgroundColor: '#fff', borderRadius: Radii.xl, padding: Spacing.lg,
@@ -107,15 +107,15 @@ const styles = StyleSheet.create({
     width: 22, height: 22, borderRadius: 11,
     backgroundColor: Colors.primaryOrange, alignItems: 'center', justifyContent: 'center',
   },
-  benefitText: { flex: 1, fontSize: Typography.base, color: Colors.textPrimary, fontWeight: FontWeight.medium },
+  benefitText: { flex: 1, fontSize: Typography.base, color: '#1A1A1A', fontWeight: FontWeight.medium },
   description: {
-    fontSize: Typography.sm, color: Colors.textSecondary, lineHeight: 22,
+    fontSize: Typography.sm, color: '#555555', lineHeight: 22,
     textAlign: 'center', marginBottom: Spacing.xl,
   },
   socialProof: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, justifyContent: 'center' },
   avatarRow: { flexDirection: 'row' },
   proofAvatar: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: '#fff' },
-  socialText: { fontSize: Typography.sm, color: Colors.textSecondary, fontWeight: FontWeight.medium },
+  socialText: { fontSize: Typography.sm, color: '#555555', fontWeight: FontWeight.medium },
   footer: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
     padding: Spacing.lg, paddingBottom: 36, backgroundColor: 'transparent',

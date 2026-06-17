@@ -72,12 +72,10 @@ export default function SegmentedControl({ options, selected, onChange }: Props)
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: Radii.full,
     padding: 3,
     position: 'relative',
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
   },
   slider: {
     position: 'absolute',

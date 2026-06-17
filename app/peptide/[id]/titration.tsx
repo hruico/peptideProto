@@ -15,7 +15,7 @@ export default function TitrationScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
         <ChevronLeft size={22} color={Colors.textPrimary} />

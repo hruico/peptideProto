@@ -19,7 +19,7 @@ const STACK_COLORS: Record<string, readonly [string, string]> = {
 export default function PopularStacksScreen() {
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>

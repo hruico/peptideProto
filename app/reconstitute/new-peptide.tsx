@@ -85,7 +85,7 @@ export default function NewPeptideScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       {/* Nav */}
       <View style={styles.navBar}>

@@ -101,7 +101,7 @@ export default function GetStartedScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D1B2A' },
+  container: { flex: 1, backgroundColor: Colors.base },
   closeBtn: {
     position: 'absolute',
     top: 52,
@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '47%',
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: Radii.xl,
     padding: Spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: Colors.surfaceBorder,
     minHeight: 140,
   },
   cardNumber: {

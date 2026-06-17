@@ -14,7 +14,7 @@ export default function TrackingIntroScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <View style={styles.content}>
         {/* Summary card */}

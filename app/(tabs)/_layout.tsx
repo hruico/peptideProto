@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Compass, Syringe, FlaskConical, Pill } from 'lucide-react-native';
+import { Compass, Syringe, Pill, Home } from 'lucide-react-native';
 import { Colors } from '../../constants/theme';
 
 export default function TabLayout() {
@@ -8,9 +8,8 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopWidth: 1,
-          borderTopColor: '#E8E0DB',
+          backgroundColor: 'rgba(26,27,58,0.96)',
+          borderTopWidth: 0,
           position: 'absolute',
           bottom: 16,
           left: 16,
@@ -21,12 +20,12 @@ export default function TabLayout() {
           paddingTop: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.12,
-          shadowRadius: 12,
-          elevation: 10,
+          shadowOpacity: 0.4,
+          shadowRadius: 16,
+          elevation: 12,
         },
         tabBarActiveTintColor: Colors.primaryOrange,
-        tabBarInactiveTintColor: 'rgba(0,0,0,0.3)',
+        tabBarInactiveTintColor: 'rgba(255,255,255,0.35)',
         tabBarLabelStyle: {
           fontSize: 10,
           fontWeight: '600',
@@ -37,8 +36,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="my-peptides"
         options={{
-          title: 'My Peptides',
-          tabBarIcon: ({ color }) => <Pill color={color} size={22} />,
+          title: 'Home',
+          tabBarIcon: ({ color }) => <Home color={color} size={22} />,
         }}
       />
       <Tabs.Screen
@@ -52,7 +51,7 @@ export default function TabLayout() {
         name="reconstitute"
         options={{
           title: 'Reconstitute',
-          tabBarIcon: ({ color }) => <FlaskConical color={color} size={22} />,
+          tabBarIcon: ({ color }) => <Syringe color={color} size={22} />,
         }}
       />
     </Tabs>

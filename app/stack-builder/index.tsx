@@ -51,7 +51,7 @@ export default function StackBuilderScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar style="dark" />
+      <StatusBar style="light" />
 
       <View style={styles.navBar}>
         <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn}>

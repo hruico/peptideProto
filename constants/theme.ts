@@ -1,31 +1,31 @@
-// Design tokens for The Peptide App
-// LIGHT THEME — white/salmon-pink backgrounds, dark text, orange CTAs
+// Design tokens — The Peptide App
+// Deep dark navy theme matching the actual app screenshots
 
 export const Colors = {
-  // Backgrounds — light theme
-  base: '#FFFFFF',
-  backgroundSecondary: '#FFF5F2',
-  surface: '#F5F0ED',
-  surfaceElevated: '#FFFFFF',
-  surfaceBorder: '#E8E0DB',
+  // Backgrounds
+  base: '#12132A',
+  backgroundSecondary: '#0D0E1F',
+  surface: '#1A1B3A',
+  surfaceElevated: '#22244A',
+  surfaceBorder: '#2E3060',
 
   // Primary accent
   primaryOrange: '#E8622A',
-  primaryOrangeLight: '#FFF0EA',
+  primaryOrangeLight: 'rgba(232,98,42,0.15)',
   accentGreen: '#2ECC71',
   accentTeal: '#4ECDC4',
   accentRed: '#E74C3C',
 
-  // Legacy aliases (keep for backwards compat)
+  // Legacy aliases
   accentOrange: '#E8622A',
-  accentOrangeLight: '#FFF0EA',
+  accentOrangeLight: 'rgba(232,98,42,0.15)',
   accentViolet: '#7B4FFF',
   accentVioletLight: '#9B6FFF',
 
   // Text
-  textPrimary: '#1A1A1A',
-  textSecondary: '#6B6B6B',
-  textTertiary: '#999999',
+  textPrimary: '#FFFFFF',
+  textSecondary: 'rgba(255,255,255,0.55)',
+  textTertiary: 'rgba(255,255,255,0.3)',
 
   // Semantic
   success: '#2ECC71',
@@ -35,8 +35,8 @@ export const Colors = {
   // Gradients
   gradientOrange: ['#E8622A', '#FF4500'] as const,
   gradientViolet: ['#7B4FFF', '#5B2FDF'] as const,
-  gradientCard: ['transparent', 'rgba(0,0,0,0.75)'] as const,
-  gradientSurface: ['#FFF5F2', '#FFFFFF'] as const,
+  gradientCard: ['transparent', 'rgba(0,0,0,0.85)'] as const,
+  gradientSurface: ['#1C1C3A', '#12132A'] as const,
 } as const;
 
 export const Spacing = {
