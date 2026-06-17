@@ -25,12 +25,13 @@ export default function SettingsScreen() {
   function doReset() {
     clearAll();
     clearActivityLog();
-    // snapshot the arrays first so forEach doesn't mutate mid-loop
     [...myProtocols].forEach(p => removeProtocol(p.id));
     [...sessions].forEach(s => removeSession(s.id));
     signOut();
+    // resetOnboarding sets hasCompletedOnboarding = false
+    // _layout.tsx useEffect watches that flag and redirects to splash automatically
+    // No need to call router.replace here — avoids double-navigation error
     resetOnboarding();
-    router.replace('/onboarding/splash' as any);
   }
 
   function handleResetDemo() {
