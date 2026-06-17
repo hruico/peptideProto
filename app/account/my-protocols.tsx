@@ -2,8 +2,9 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { router } from 'expo-router';
 import { X, Plus, FlaskConical } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
-import { differenceInDays, format } from 'date-fns';
+import { differenceInDays } from 'date-fns';
 import { useProtocolStore } from '../../store/useProtocolStore';
+import { getPeptideById } from '../../data/peptides';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
 export default function MyProtocolsScreen() {
@@ -16,52 +17,61 @@ export default function MyProtocolsScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>My Protocols</Text>
         <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
-          <X size={18} color="rgba(255,255,255,0.6)" />
+          <X size={18} color={Colors.textPrimary} />
         </TouchableOpacity>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {myProtocols.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No protocols yet.</Text>
-            <Text style={styles.emptySubText}>
-              Use the buttons above to create your first protocol.
+            <Text style={styles.emptyEmoji}>📋</Text>
+            <Text style={styles.emptyTitle}>No protocols yet</Text>
+            <Text style={styles.emptySub}>
+              Start a protocol from the Explore tab or your peptide detail page.
             </Text>
           </View>
         ) : (
           myProtocols.map((protocol) => {
             const dayOn = differenceInDays(new Date(), new Date(protocol.startedAt)) + 1;
             const progress = Math.min(dayOn / protocol.durationDays, 1);
-
             return (
-              <View key={protocol.id} style={styles.card}>
+              <TouchableOpacity
+                key={protocol.id}
+                style={styles.card}
+                onPress={() => router.push({ pathname: '/protocol/[id]', params: { id: protocol.id } })}
+                activeOpacity={0.8}
+              >
                 <View style={styles.cardHeader}>
                   <View style={styles.iconCircle}>
-                    <FlaskConical size={16} color={Colors.accentOrange} />
+                    <FlaskConical size={16} color={Colors.primaryOrange} />
                   </View>
                   <View style={styles.cardTitles}>
                     <Text style={styles.cardName}>{protocol.name}</Text>
-                    <Text style={styles.cardSub}>
-                      Day {dayOn} of {protocol.durationDays}
-                    </Text>
+                    <Text style={styles.cardSub}>Day {dayOn} of {protocol.durationDays}</Text>
                   </View>
-                  <TouchableOpacity onPress={() => removeProtocol(protocol.id)}>
-                    <X size={14} color="rgba(255,255,255,0.3)" />
+                  <TouchableOpacity onPress={() => removeProtocol(protocol.id)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                    <X size={14} color={Colors.textTertiary} />
                   </TouchableOpacity>
                 </View>
 
+                {/* Progress bar */}
                 <View style={styles.progressBg}>
-                  <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` }]} />
+                  <View style={[styles.progressFill, { width: `${Math.round(progress * 100)}%` as any }]} />
                 </View>
+                <Text style={styles.progressLabel}>{Math.round(progress * 100)}% complete</Text>
 
+                {/* Peptide chips with names */}
                 <View style={styles.chips}>
-                  {protocol.peptideIds.slice(0, 4).map((pid) => (
-                    <View key={pid} style={styles.chip}>
-                      <Text style={styles.chipText}>{pid.toUpperCase().replace(/-\d+$/, '')}</Text>
-                    </View>
-                  ))}
+                  {protocol.peptideIds.slice(0, 4).map((pid) => {
+                    const p = getPeptideById(pid);
+                    return (
+                      <View key={pid} style={styles.chip}>
+                        <Text style={styles.chipText}>{p?.name ?? pid.toUpperCase()}</Text>
+                      </View>
+                    );
+                  })}
                 </View>
-              </View>
+              </TouchableOpacity>
             );
           })
         )}
@@ -75,15 +85,6 @@ export default function MyProtocolsScreen() {
       >
         <Plus size={24} color="#fff" />
       </TouchableOpacity>
-
-      {/* Tooltip hint */}
-      {myProtocols.length === 0 && (
-        <View style={styles.tooltip}>
-          <Text style={styles.tooltipText}>
-            Tap here to add custom protocols or create new collections
-          </Text>
-        </View>
-      )}
     </View>
   );
 }
@@ -91,99 +92,46 @@ export default function MyProtocolsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.base },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 56,
-    paddingHorizontal: Spacing.lg,
-    paddingBottom: Spacing.md,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingTop: 56, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.md,
+    borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
   },
-  title: {
-    color: '#FFFFFF',
-    fontSize: Typography.xl,
-    fontWeight: FontWeight.extrabold,
-  },
+  title: { color: Colors.textPrimary, fontSize: Typography.xl, fontWeight: FontWeight.extrabold },
   closeBtn: {
-    width: 34, height: 34, borderRadius: 17,
-    backgroundColor: Colors.surfaceElevated,
-    alignItems: 'center', justifyContent: 'center',
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center',
   },
-  scroll: { paddingHorizontal: Spacing.lg, paddingBottom: 120 },
-  emptyState: {
-    alignItems: 'center',
-    paddingTop: Spacing.xxl,
-    gap: Spacing.sm,
-  },
-  emptyText: {
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: Typography.base,
-    fontWeight: FontWeight.medium,
-  },
-  emptySubText: {
-    color: 'rgba(255,255,255,0.3)',
-    fontSize: Typography.sm,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
+  scroll: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.lg, paddingBottom: 120 },
+  emptyState: { alignItems: 'center', paddingTop: 60, gap: Spacing.sm },
+  emptyEmoji: { fontSize: 56, marginBottom: Spacing.sm },
+  emptyTitle: { color: Colors.textPrimary, fontSize: Typography.lg, fontWeight: FontWeight.bold },
+  emptySub: { color: Colors.textSecondary, fontSize: Typography.sm, textAlign: 'center', lineHeight: 22, paddingHorizontal: Spacing.lg },
   card: {
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: Radii.xl,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
-    gap: Spacing.sm,
+    backgroundColor: Colors.surface, borderRadius: Radii.xl, padding: Spacing.md,
+    marginBottom: Spacing.md, borderWidth: 1, borderColor: Colors.surfaceBorder, gap: Spacing.sm,
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
   iconCircle: {
-    width: 32, height: 32, borderRadius: 8,
-    backgroundColor: 'rgba(255,107,43,0.12)',
-    alignItems: 'center', justifyContent: 'center',
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: Colors.primaryOrangeLight, alignItems: 'center', justifyContent: 'center',
   },
   cardTitles: { flex: 1 },
-  cardName: { color: '#FFF', fontSize: Typography.base, fontWeight: FontWeight.bold },
-  cardSub: { color: 'rgba(255,255,255,0.4)', fontSize: Typography.xs, marginTop: 1 },
-  progressBg: {
-    height: 3,
-    backgroundColor: Colors.surfaceBorder,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: Colors.accentOrange,
-    borderRadius: 2,
-  },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+  cardName: { color: Colors.textPrimary, fontSize: Typography.base, fontWeight: FontWeight.bold },
+  cardSub: { color: Colors.textSecondary, fontSize: Typography.xs, marginTop: 2 },
+  progressBg: { height: 6, backgroundColor: Colors.surfaceBorder, borderRadius: 3, overflow: 'hidden' },
+  progressFill: { height: '100%', backgroundColor: Colors.primaryOrange, borderRadius: 3 },
+  progressLabel: { fontSize: Typography.xs, color: Colors.textTertiary },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
-    backgroundColor: Colors.surface,
-    borderRadius: Radii.full,
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: 2,
+    backgroundColor: Colors.primaryOrangeLight, borderRadius: Radii.full,
+    paddingHorizontal: Spacing.sm, paddingVertical: 3,
   },
-  chipText: { color: 'rgba(255,255,255,0.4)', fontSize: 10 },
+  chipText: { color: Colors.primaryOrange, fontSize: Typography.xs, fontWeight: FontWeight.semibold },
   fab: {
-    position: 'absolute',
-    bottom: 32, right: Spacing.lg,
+    position: 'absolute', bottom: 32, right: Spacing.lg,
     width: 52, height: 52, borderRadius: 26,
-    backgroundColor: Colors.accentOrange,
-    alignItems: 'center', justifyContent: 'center',
-    shadowColor: Colors.accentOrange,
-    shadowOffset: { width: 0, height: 4 },
+    backgroundColor: Colors.primaryOrange, alignItems: 'center', justifyContent: 'center',
+    shadowColor: Colors.primaryOrange, shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4, shadowRadius: 8, elevation: 8,
-  },
-  tooltip: {
-    position: 'absolute',
-    bottom: 92,
-    right: Spacing.lg,
-    backgroundColor: Colors.accentOrange,
-    borderRadius: Radii.lg,
-    padding: Spacing.md,
-    maxWidth: 200,
-  },
-  tooltipText: {
-    color: '#FFF',
-    fontSize: Typography.xs,
-    lineHeight: 16,
   },
 });

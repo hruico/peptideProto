@@ -75,7 +75,7 @@ export default function GoalPickerScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1, backgroundColor: '#0D1B2A' },
   backBtn: {
     position: 'absolute',
     top: 52,

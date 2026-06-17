@@ -6,42 +6,54 @@ import {
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Shield, TrendingUp, Camera, BookOpen } from 'lucide-react-native';
 import { Colors, Typography, FontWeight, Spacing, Radii } from '../../constants/theme';
 
 const { width } = Dimensions.get('window');
+
+// Onboarding keeps a dark theme — it's a premium launch experience
+const BG = '#0D1B2A';
 
 const SLIDES = [
   {
     id: '1',
     title: 'Your Goals,\nOur Guide',
-    body: 'From Retatrutide to BPC-157 — expert-curated protocols for every stage of your journey.',
-    tag: 'Expert Curated Protocols',
-    testimonial: 'Finally an app that makes peptides simple\n— Mike R.',
+    body: 'Expert-curated protocols for every stage of your journey — from BPC-157 to Retatrutide.',
+    tag: 'EXPERT PROTOCOLS',
+    testimonial: '"Finally an app that makes peptides simple." — Mike R.',
     isDisclaimer: false,
+    gradientColors: ['#1A2A4A', '#0D1B2A'] as const,
+    icon: <BookOpen size={48} color="rgba(255,255,255,0.6)" />,
   },
   {
     id: '2',
-    title: "We'll walk you\nthrough it",
-    body: "From your first reconstitution to your hundredth injection, we've got you covered with practical guidance, safety context, and schedule support.",
-    tag: 'Simple reconstitutions',
-    testimonial: 'Finally an app that makes peptides simple\n— Mike R.',
+    title: "Unlock your\npotential",
+    body: "Real people, real results. Peptides are changing what's possible — get the protocol that fits your life.",
+    tag: 'TRACK WHAT MATTERS',
+    testimonial: '"Down 14 lbs in 8 weeks. Skin is glowing." — Sarah J.',
     isDisclaimer: false,
+    gradientColors: ['#2A1A4A', '#1A0D3A'] as const,
+    icon: <TrendingUp size={48} color="rgba(255,255,255,0.6)" />,
   },
   {
     id: '3',
     title: 'See your\ntransformation',
-    body: 'Real people, real results. Document your journey and watch your progress unfold week by week.',
-    tag: 'Track what matters to you',
-    testimonial: 'The calculator alone is worth it\n— Sarah J.',
+    body: 'Document your journey week by week. Track doses, outcomes, and progress photos — all in one place.',
+    tag: 'DOCUMENT YOUR JOURNEY',
+    testimonial: '"The calculator alone is worth it." — James T.',
     isDisclaimer: false,
+    gradientColors: ['#1A3A2A', '#0D2A1A'] as const,
+    icon: <Camera size={48} color="rgba(255,255,255,0.6)" />,
   },
   {
     id: '4',
-    title: 'This app is not\nmedical advice',
+    title: 'Not medical\nadvice',
     body: 'This app is for educational purposes only. Always consult a licensed healthcare provider before starting any protocol.',
     tag: '',
     testimonial: '',
     isDisclaimer: true,
+    gradientColors: ['#1A2A4A', '#2A3A6A'] as const,
+    icon: <Shield size={48} color="#60A5FA" />,
   },
 ];
 
@@ -69,40 +81,36 @@ export default function CarouselScreen() {
         scrollEventThrottle={16}
         renderItem={({ item }) => (
           <View style={styles.slide}>
-            {/* Image placeholder area */}
-            <View style={styles.imageArea}>
-              <LinearGradient
-                colors={item.isDisclaimer
-                  ? ['#1A2A4A', '#2A3A6A']
-                  : ['#1A2A4A', '#0D1B2A']}
-                style={styles.imagePlaceholder}
-              >
-                {item.isDisclaimer ? (
-                  <View style={styles.shieldContainer}>
-                    <View style={styles.shieldOuter}>
-                      <View style={styles.shieldInner}>
-                        <Text style={styles.shieldPlus}>+</Text>
-                      </View>
+            {/* Upper visual area */}
+            <LinearGradient colors={item.gradientColors} style={styles.imageArea}>
+              <View style={styles.iconWrap}>{item.icon}</View>
+              {item.tag ? (
+                <View style={styles.tagPill}>
+                  <Text style={styles.tagText}>{item.tag}</Text>
+                </View>
+              ) : null}
+              {/* Stat bubbles for slide 2 */}
+              {item.id === '2' && (
+                <View style={styles.bubblesContainer}>
+                  {[
+                    { label: '-14 lbs in 8 weeks', color: '#F97316' },
+                    { label: '+9 lbs muscle', color: '#3B82F6' },
+                    { label: 'Skin: Glowing', color: '#EC4899' },
+                    { label: 'Focus: Sharp', color: '#8B5CF6' },
+                  ].map((b, i) => (
+                    <View key={i} style={[styles.bubble, { backgroundColor: b.color + '33', borderColor: b.color + '66' }]}>
+                      <Text style={[styles.bubbleText, { color: b.color }]}>{b.label}</Text>
                     </View>
-                  </View>
-                ) : (
-                  <View style={styles.collageContainer}>
-                    <View style={styles.collageCard}>
-                      <Text style={styles.collageText}>{item.tag}</Text>
-                    </View>
-                  </View>
-                )}
-              </LinearGradient>
-            </View>
+                  ))}
+                </View>
+              )}
+            </LinearGradient>
 
             {/* Text content */}
             <View style={styles.textBlock}>
-              <Text style={[styles.title, item.isDisclaimer && styles.titleLight]}>
-                {item.title}
-              </Text>
+              <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.body}>{item.body}</Text>
 
-              {/* Testimonial */}
               {!!item.testimonial && (
                 <View style={styles.testimonialRow}>
                   <View style={styles.testimonialAvatar} />
@@ -110,7 +118,6 @@ export default function CarouselScreen() {
                 </View>
               )}
 
-              {/* Disclaimer CTA */}
               {item.isDisclaimer && (
                 <TouchableOpacity
                   style={styles.understandBtn}
@@ -120,10 +127,9 @@ export default function CarouselScreen() {
                   <LinearGradient
                     colors={[Colors.accentViolet, '#5B2FDF']}
                     style={styles.understandGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
+                    start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                   >
-                    <Text style={styles.understandText}>I understand</Text>
+                    <Text style={styles.understandText}>I understand →</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               )}
@@ -132,7 +138,7 @@ export default function CarouselScreen() {
         )}
       />
 
-      {/* Dots */}
+      {/* Progress dots */}
       <View style={styles.dots}>
         {SLIDES.map((_, i) => (
           <View key={i} style={[styles.dot, i === activeIndex && styles.dotActive]} />
@@ -143,132 +149,53 @@ export default function CarouselScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
-  slide: {
-    width,
-    flex: 1,
-  },
+  container: { flex: 1, backgroundColor: BG },
+  slide: { width, flex: 1 },
   imageArea: {
     flex: 1,
-    maxHeight: '50%',
-  },
-  imagePlaceholder: {
-    flex: 1,
+    maxHeight: '52%',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: Spacing.lg,
   },
-  collageContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+  iconWrap: {
+    width: 96, height: 96, borderRadius: 48,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    alignItems: 'center', justifyContent: 'center',
   },
-  collageCard: {
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: Radii.lg,
-    padding: Spacing.lg,
-    alignItems: 'center',
+  tagPill: {
+    backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: Radii.full,
+    paddingHorizontal: Spacing.md, paddingVertical: 6,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)',
   },
-  collageText: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: Typography.sm,
-    fontWeight: FontWeight.medium,
-  },
-  // Shield for disclaimer
-  shieldContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shieldOuter: {
-    width: 120,
-    height: 140,
-    borderRadius: 60,
-    backgroundColor: 'rgba(96,165,250,0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shieldInner: {
-    width: 80,
-    height: 90,
-    borderRadius: 40,
-    backgroundColor: 'rgba(96,165,250,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shieldPlus: {
-    color: '#60A5FA',
-    fontSize: 40,
-    fontWeight: FontWeight.bold,
-  },
+  tagText: { color: 'rgba(255,255,255,0.8)', fontSize: Typography.xs, fontWeight: FontWeight.semibold, letterSpacing: 1.5 },
+  bubblesContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm, paddingHorizontal: Spacing.xl, justifyContent: 'center' },
+  bubble: { borderRadius: Radii.full, paddingHorizontal: Spacing.md, paddingVertical: 6, borderWidth: 1 },
+  bubbleText: { fontSize: Typography.xs, fontWeight: FontWeight.semibold },
   textBlock: {
-    flex: 1,
-    paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.xl,
-    gap: Spacing.md,
+    flex: 1, paddingHorizontal: Spacing.xl, paddingTop: Spacing.xl, gap: Spacing.md,
   },
   title: {
-    color: '#FFFFFF',
-    fontSize: Typography.xxl,
-    fontWeight: FontWeight.bold,
-    lineHeight: 36,
-    textAlign: 'center',
-  },
-  titleLight: {
-    fontSize: Typography.xl,
+    color: '#FFFFFF', fontSize: Typography.xxl, fontWeight: FontWeight.extrabold,
+    lineHeight: 38, textAlign: 'center',
   },
   body: {
-    color: 'rgba(255,255,255,0.55)',
-    fontSize: Typography.sm,
-    lineHeight: 22,
-    textAlign: 'center',
+    color: 'rgba(255,255,255,0.55)', fontSize: Typography.sm,
+    lineHeight: 22, textAlign: 'center',
   },
   testimonialRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.sm,
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: Radii.lg,
-    padding: Spacing.sm,
+    flexDirection: 'row', alignItems: 'center', gap: Spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: Radii.lg,
+    padding: Spacing.sm, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
   },
   testimonialAvatar: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.accentOrange,
+    width: 28, height: 28, borderRadius: 14, backgroundColor: Colors.accentOrange,
   },
-  testimonialText: {
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: Typography.xs,
-    flex: 1,
-    lineHeight: 16,
-  },
-  understandBtn: {
-    borderRadius: 32,
-    overflow: 'hidden',
-    marginTop: Spacing.sm,
-  },
-  understandGradient: {
-    paddingVertical: 16,
-    alignItems: 'center',
-  },
-  understandText: {
-    color: '#FFFFFF',
-    fontSize: Typography.base,
-    fontWeight: FontWeight.semibold,
-  },
-  dots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 6,
-    paddingBottom: 32,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-  dotActive: {
-    backgroundColor: '#FFFFFF',
-    width: 20,
-  },
+  testimonialText: { color: 'rgba(255,255,255,0.6)', fontSize: Typography.xs, flex: 1, lineHeight: 16 },
+  understandBtn: { borderRadius: 32, overflow: 'hidden', marginTop: Spacing.sm },
+  understandGradient: { paddingVertical: 16, alignItems: 'center' },
+  understandText: { color: '#FFFFFF', fontSize: Typography.base, fontWeight: FontWeight.semibold },
+  dots: { flexDirection: 'row', justifyContent: 'center', gap: 6, paddingBottom: 36 },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.2)' },
+  dotActive: { backgroundColor: Colors.primaryOrange, width: 20 },
 });

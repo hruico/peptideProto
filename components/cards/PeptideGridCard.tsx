@@ -1,82 +1,122 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 import type { Peptide } from '../../types';
-
-// Vibrant colors matching the design screenshots
-const CATEGORY_COLORS: Record<string, { bg: string; label: string }> = {
-  'Fat Loss':                    { bg: '#F97316', label: 'FAT LOSS' },
-  'Recovery & Healing':          { bg: '#22C55E', label: 'HEALING' },
-  'Muscle & Performance':        { bg: '#EF4444', label: 'PERFORMANCE' },
-  'Cognitive & Neuroprotection': { bg: '#8B5CF6', label: 'BRAIN' },
-  'Sleep & Longevity':           { bg: '#3B82F6', label: 'LONGEVITY' },
-  'Sexual Health':               { bg: '#EC4899', label: 'VITALITY' },
-  'Skin & Aesthetics':           { bg: '#F59E0B', label: 'SKIN & REPAIR' },
-  'GI & Gut Health':             { bg: '#10B981', label: 'GUT HEALTH' },
-};
+import { Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
 interface Props {
   peptide: Peptide;
   onPress: () => void;
 }
 
+const CATEGORY_COLORS: Record<string, string> = {
+  'Recovery & Healing': '#EF4444',
+  'Fat Loss': '#F97316',
+  'Muscle & Performance': '#3B82F6',
+  'Cognitive & Neuroprotection': '#8B5CF6',
+  'Sleep & Longevity': '#6366F1',
+  'Sexual Health': '#EC4899',
+  'Skin & Aesthetics': '#EC4899',
+  'GI & Gut Health': '#22C55E',
+};
+
+const CATEGORY_BG: Record<string, string> = {
+  'Recovery & Healing': '#7F1D1D',
+  'Fat Loss': '#7C2D12',
+  'Muscle & Performance': '#1E3A8A',
+  'Cognitive & Neuroprotection': '#4C1D95',
+  'Sleep & Longevity': '#312E81',
+  'Sexual Health': '#831843',
+  'Skin & Aesthetics': '#831843',
+  'GI & Gut Health': '#14532D',
+};
+
 export default function PeptideGridCard({ peptide, onPress }: Props) {
-  const config = CATEGORY_COLORS[peptide.category] ?? { bg: '#7B4FFF', label: 'PEPTIDE' };
-  const firstLetter = peptide.name.charAt(0).toUpperCase();
+  const accentColor = CATEGORY_COLORS[peptide.category] ?? '#6366F1';
+  const bgColor = CATEGORY_BG[peptide.category] ?? '#1E1E3A';
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: config.bg }]}
       onPress={onPress}
       activeOpacity={0.85}
+      style={[styles.card, { backgroundColor: bgColor }]}
     >
-      {/* Giant translucent watermark */}
-      <Text style={styles.watermark}>{firstLetter}</Text>
+      {/* Watermark letter */}
+      <Text style={[styles.watermark, { color: accentColor }]}>
+        {peptide.name[0]}
+      </Text>
 
-      {/* Category label */}
-      <Text style={styles.categoryLabel}>{config.label}</Text>
-
-      {/* Name & description */}
-      <Text style={styles.name}>{peptide.name}</Text>
-      <Text style={styles.description} numberOfLines={2}>{peptide.description}</Text>
+      {/* Content */}
+      <View style={styles.content}>
+        <View style={[styles.categoryPill, { backgroundColor: accentColor + '33' }]}>
+          <Text style={[styles.categoryText, { color: accentColor }]}>
+            {peptide.category.replace(' & ', ' ')}
+          </Text>
+        </View>
+        <Text style={styles.name}>{peptide.name}</Text>
+        <Text style={styles.description} numberOfLines={2}>
+          {peptide.description}
+        </Text>
+        <View style={styles.doseTag}>
+          <Text style={styles.doseText}>{peptide.typicalDose} {peptide.doseUnit}</Text>
+        </View>
+      </View>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
     borderRadius: Radii.xl,
     padding: Spacing.md,
-    minHeight: 160,
+    minHeight: 180,
     overflow: 'hidden',
+    position: 'relative',
     justifyContent: 'flex-end',
   },
   watermark: {
     position: 'absolute',
-    right: -8,
-    top: -16,
+    top: -12,
+    right: 8,
     fontSize: 110,
     fontWeight: FontWeight.extrabold,
-    color: 'rgba(255,255,255,0.15)',
-    lineHeight: 120,
+    opacity: 0.18,
+    lineHeight: 110,
   },
-  categoryLabel: {
-    color: 'rgba(255,255,255,0.75)',
+  content: {
+    gap: 6,
+  },
+  categoryPill: {
+    alignSelf: 'flex-start',
+    borderRadius: Radii.full,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  categoryText: {
     fontSize: 9,
     fontWeight: FontWeight.bold,
-    letterSpacing: 0.8,
-    marginBottom: 4,
+    letterSpacing: 0.5,
   },
   name: {
     color: '#FFFFFF',
-    fontSize: Typography.md,
+    fontSize: Typography.base,
     fontWeight: FontWeight.extrabold,
-    lineHeight: 22,
   },
   description: {
-    color: 'rgba(255,255,255,0.7)',
+    color: 'rgba(255,255,255,0.55)',
     fontSize: Typography.xs,
-    lineHeight: 15,
-    marginTop: 2,
+    lineHeight: 16,
+  },
+  doseTag: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: Radii.full,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  doseText: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: 10,
+    fontWeight: FontWeight.medium,
   },
 });

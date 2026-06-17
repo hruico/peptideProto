@@ -1,8 +1,8 @@
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Users } from 'lucide-react-native';
-import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import { Users, Clock } from 'lucide-react-native';
 import type { Protocol } from '../../types';
+import { Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
 interface Props {
   protocol: Protocol;
@@ -11,111 +11,136 @@ interface Props {
   fullWidth?: boolean;
 }
 
-export default function ProtocolHeroCard({ protocol, onPress, width = 260, fullWidth = false }: Props) {
-  // Build subtitle: "6 weeks · TB-500 · BPC"
-  const meta = [protocol.durationLabel, ...protocol.peptideIds.slice(0, 3).map(id => id.toUpperCase().replace(/-\d+$/, ''))].join(' · ');
+const SCREEN_W = Dimensions.get('window').width;
+
+// Per-protocol gradient colors
+const PROTOCOL_GRADIENTS: Record<string, readonly [string, string]> = {
+  'injury-recovery-stack': ['#B91C1C', '#7F1D1D'],
+  'gh-optimizer': ['#1D4ED8', '#1E3A8A'],
+  'cognitive-edge': ['#6D28D9', '#4C1D95'],
+  'longevity-protocol': ['#0F766E', '#134E4A'],
+  'body-recomp': ['#C2410C', '#7C2D12'],
+  'elite-recovery': ['#15803D', '#14532D'],
+  'gut-reset': ['#4338CA', '#312E81'],
+};
+
+const CATEGORY_GRADIENTS: Record<string, readonly [string, string]> = {
+  'curated-combo': ['#1D4ED8', '#1E3A8A'],
+  'expert-protocol': ['#6D28D9', '#4C1D95'],
+  'community': ['#0F766E', '#134E4A'],
+};
+
+export default function ProtocolHeroCard({ protocol, onPress, width, fullWidth }: Props) {
+  const cardWidth = fullWidth ? SCREEN_W - 48 : (width ?? 260);
+  const gradient = PROTOCOL_GRADIENTS[protocol.id] ?? CATEGORY_GRADIENTS[protocol.category] ?? ['#1A1A2E', '#0D1225'];
+
+  const participantDisplay = protocol.participantCount >= 1000
+    ? `${(protocol.participantCount / 1000).toFixed(1)}k`
+    : protocol.participantCount.toString();
 
   return (
     <TouchableOpacity
-      style={[styles.card, fullWidth ? styles.cardFull : { width }]}
       onPress={onPress}
-      activeOpacity={0.9}
+      activeOpacity={0.88}
+      style={[styles.wrapper, { width: cardWidth }, fullWidth && styles.fullWidthWrapper]}
     >
-      <ImageBackground
-        source={require('../../assets/images/splash-icon.png')}
-        style={styles.image}
-        imageStyle={[styles.imageStyle, { tintColor: getProtocolColor(protocol.id) }]}
+      <LinearGradient
+        colors={gradient}
+        style={styles.card}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
-        <LinearGradient
-          colors={['transparent', 'rgba(0,0,0,0.75)']}
-          style={styles.gradient}
-        >
-          {/* Participant badge — top right */}
-          <View style={styles.badgeRow}>
-            <View style={styles.badge}>
-              <Users size={11} color="rgba(255,255,255,0.8)" />
-              <Text style={styles.badgeText}>{protocol.participantCount} on this</Text>
+        {/* Category label top-left */}
+        <View style={styles.categoryBadge}>
+          <Text style={styles.categoryBadgeText}>
+            {protocol.category === 'curated-combo' ? 'POPULAR STACK' : 'EXPERT PROTOCOL'}
+          </Text>
+        </View>
+
+        {/* Bottom content */}
+        <View style={styles.bottomContent}>
+          <Text style={styles.name} numberOfLines={2}>{protocol.name}</Text>
+          <Text style={styles.subtitle} numberOfLines={1}>{protocol.subtitle}</Text>
+
+          <View style={styles.metaRow}>
+            <View style={styles.metaBadge}>
+              <Clock size={10} color="rgba(255,255,255,0.8)" />
+              <Text style={styles.metaText}>{protocol.durationLabel}</Text>
+            </View>
+            <View style={styles.metaBadge}>
+              <Users size={10} color="rgba(255,255,255,0.8)" />
+              <Text style={styles.metaText}>{participantDisplay} started</Text>
+            </View>
+            <View style={styles.metaBadge}>
+              <Text style={styles.metaText}>{protocol.peptideIds.length} peptides</Text>
             </View>
           </View>
-
-          {/* Bottom text */}
-          <View style={styles.bottomText}>
-            <Text style={styles.name}>{protocol.name}</Text>
-            <Text style={styles.meta}>{meta}</Text>
-          </View>
-        </LinearGradient>
-      </ImageBackground>
+        </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
 }
 
-// Give each protocol a distinct tint color for the placeholder image
-function getProtocolColor(id: string): string {
-  const colors: Record<string, string> = {
-    'injury-recovery-stack': '#FF6B2B',
-    'gh-optimizer': '#7B4FFF',
-    'cognitive-edge': '#4ADE80',
-    'longevity-protocol': '#60A5FA',
-    'body-recomp': '#F59E0B',
-    'elite-recovery': '#EF4444',
-    'gut-reset': '#10B981',
-  };
-  return colors[id] ?? '#FF6B2B';
-}
-
 const styles = StyleSheet.create({
-  card: {
-    height: 200,
+  wrapper: {
     borderRadius: Radii.xl,
     overflow: 'hidden',
     marginRight: Spacing.md,
   },
-  cardFull: {
-    width: '100%',
+  fullWidthWrapper: {
     marginRight: 0,
     marginBottom: Spacing.md,
   },
-  image: {
-    flex: 1,
-    backgroundColor: Colors.surfaceElevated,
-  },
-  imageStyle: {
-    borderRadius: Radii.xl,
-    opacity: 0.4,
-  },
-  gradient: {
-    flex: 1,
+  card: {
+    height: 200,
     padding: Spacing.md,
     justifyContent: 'space-between',
   },
-  badgeRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+  categoryBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: Radii.full,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
-  badgeText: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: Typography.xs,
-    fontWeight: FontWeight.medium,
+  categoryBadgeText: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 9,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 1,
   },
-  bottomText: {
-    gap: 4,
+  bottomContent: {
+    gap: 6,
   },
   name: {
     color: '#FFFFFF',
     fontSize: Typography.lg,
     fontWeight: FontWeight.extrabold,
+    lineHeight: 26,
   },
-  meta: {
+  subtitle: {
     color: 'rgba(255,255,255,0.65)',
     fontSize: Typography.xs,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  metaBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderRadius: Radii.full,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 3,
+  },
+  metaText: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 10,
+    fontWeight: FontWeight.medium,
   },
 });

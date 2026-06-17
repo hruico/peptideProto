@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { router } from 'expo-router';
-import { X, Image as ImageIcon, ChevronRight } from 'lucide-react-native';
+import { X, User, ChevronRight, Settings } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
 import { format } from 'date-fns';
 import { useUserStore } from '../../store/useUserStore';
@@ -8,7 +8,6 @@ import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/
 
 export default function AccountScreen() {
   const { user, isGuest, signIn } = useUserStore();
-
   const memberYear = user?.createdAt
     ? format(new Date(user.createdAt), 'yyyy')
     : new Date().getFullYear().toString();
@@ -19,20 +18,19 @@ export default function AccountScreen() {
 
       {/* Close */}
       <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
-        <X size={18} color="rgba(255,255,255,0.6)" />
+        <X size={18} color={Colors.textPrimary} />
       </TouchableOpacity>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-
         {/* Avatar */}
         <View style={styles.avatarContainer}>
           <View style={styles.avatar}>
-            <ImageIcon size={36} color="rgba(255,255,255,0.3)" />
+            <User size={36} color={Colors.textSecondary} />
           </View>
           <Text style={styles.displayName}>
             {isGuest ? 'Guest' : (user?.displayName ?? 'User')}
           </Text>
-          <Text style={styles.since}>since {memberYear}</Text>
+          <Text style={styles.since}>Member since {memberYear}</Text>
         </View>
 
         {/* Save Account card */}
@@ -40,7 +38,7 @@ export default function AccountScreen() {
           <View style={styles.saveCard}>
             <View style={styles.saveCardLeft}>
               <Text style={styles.saveCardTitle}>Save Your Account</Text>
-              <Text style={styles.saveCardSub}>Sync across devices</Text>
+              <Text style={styles.saveCardSub}>Sync across devices and keep your data</Text>
             </View>
             <TouchableOpacity
               style={styles.signInBtn}
@@ -52,59 +50,51 @@ export default function AccountScreen() {
           </View>
         )}
 
+        {/* Menu section */}
+        <View style={styles.menuSection}>
+          <TouchableOpacity
+            style={styles.menuRow}
+            onPress={() => router.push('/account/my-protocols')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.menuRowText}>My Protocols</Text>
+            <ChevronRight size={18} color={Colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={styles.separator} />
+
+          <TouchableOpacity
+            style={styles.menuRow}
+            onPress={() => router.push('/account/stats')}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.menuRowText}>Stats & Activity</Text>
+            <ChevronRight size={18} color={Colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={styles.separator} />
+
+          <TouchableOpacity
+            style={styles.menuRow}
+            onPress={() => router.push('/account/settings' as any)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.menuRowText}>Settings</Text>
+            <ChevronRight size={18} color={Colors.textTertiary} />
+          </TouchableOpacity>
+        </View>
+
         {/* Set Up Public Profile */}
         <TouchableOpacity
           style={[styles.profileRow, isGuest && styles.profileRowDisabled]}
           disabled={isGuest}
-          onPress={() => {
-            if (!isGuest) {
-              Alert.alert('Public Profile', 'Public profile setup coming soon!');
-            }
-          }}
+          onPress={() => Alert.alert('Public Profile', 'Coming soon!')}
           activeOpacity={0.8}
         >
-          <View style={styles.profileRowLeft}>
-            <View style={[styles.profileDot, isGuest && styles.profileDotDisabled]} />
-            <View>
-              <Text style={[styles.profileRowTitle, isGuest && styles.disabledText]}>
-                Set Up Public Profile
-              </Text>
-              {isGuest && (
-                <Text style={styles.profileRowHint}>Sign in first to create a public profile</Text>
-              )}
-            </View>
-          </View>
-          <ChevronRight size={16} color="rgba(255,255,255,0.2)" />
-        </TouchableOpacity>
-
-        {/* My Protocols */}
-        <TouchableOpacity
-          style={styles.menuRow}
-          onPress={() => router.push('/account/my-protocols')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.menuRowText}>My Protocols</Text>
-          <ChevronRight size={16} color="rgba(255,255,255,0.3)" />
-        </TouchableOpacity>
-
-        {/* Stats */}
-        <TouchableOpacity
-          style={styles.menuRow}
-          onPress={() => router.push('/account/stats')}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.menuRowText}>Stats & Activity</Text>
-          <ChevronRight size={16} color="rgba(255,255,255,0.3)" />
-        </TouchableOpacity>
-
-        {/* Settings */}
-        <TouchableOpacity
-          style={styles.menuRow}
-          onPress={() => router.push('/account/settings' as any)}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.menuRowText}>Settings</Text>
-          <ChevronRight size={16} color="rgba(255,255,255,0.3)" />
+          <Text style={[styles.profileRowTitle, isGuest && { color: Colors.textTertiary }]}>
+            Set Up Public Profile
+          </Text>
+          {isGuest && <Text style={styles.profileRowHint}>Sign in first</Text>}
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -114,126 +104,50 @@ export default function AccountScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: Colors.base },
   closeBtn: {
-    position: 'absolute',
-    top: 52,
-    right: Spacing.lg,
-    zIndex: 10,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: Colors.surfaceElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
+    position: 'absolute', top: 52, right: Spacing.lg, zIndex: 10,
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center',
   },
   scroll: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: 100,
-    paddingBottom: 48,
-    alignItems: 'center',
+    paddingHorizontal: Spacing.lg, paddingTop: 100, paddingBottom: 48, alignItems: 'center',
   },
-  avatarContainer: {
-    alignItems: 'center',
-    marginBottom: Spacing.xl,
-    gap: Spacing.xs,
-  },
+  avatarContainer: { alignItems: 'center', marginBottom: Spacing.xl, gap: Spacing.sm },
   avatar: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    backgroundColor: Colors.surfaceElevated,
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.sm,
+    width: 88, height: 88, borderRadius: 44,
+    backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.surfaceBorder,
+    alignItems: 'center', justifyContent: 'center', marginBottom: Spacing.sm,
   },
-  displayName: {
-    color: '#FFFFFF',
-    fontSize: Typography.xl,
-    fontWeight: FontWeight.extrabold,
-  },
-  since: {
-    color: 'rgba(255,255,255,0.4)',
-    fontSize: Typography.sm,
-  },
+  displayName: { color: Colors.textPrimary, fontSize: Typography.xl, fontWeight: FontWeight.extrabold },
+  since: { color: Colors.textTertiary, fontSize: Typography.sm },
   saveCard: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.accentViolet,
-    borderRadius: Radii.xl,
-    padding: Spacing.lg,
-    marginBottom: Spacing.md,
+    width: '100%', flexDirection: 'row', alignItems: 'center',
+    backgroundColor: Colors.primaryOrange, borderRadius: Radii.xl,
+    padding: Spacing.lg, marginBottom: Spacing.xl,
   },
   saveCardLeft: { flex: 1 },
-  saveCardTitle: {
-    color: '#FFFFFF',
-    fontSize: Typography.base,
-    fontWeight: FontWeight.bold,
-  },
-  saveCardSub: {
-    color: 'rgba(255,255,255,0.65)',
-    fontSize: Typography.xs,
-    marginTop: 2,
-  },
+  saveCardTitle: { color: '#fff', fontSize: Typography.base, fontWeight: FontWeight.bold },
+  saveCardSub: { color: 'rgba(255,255,255,0.75)', fontSize: Typography.xs, marginTop: 2 },
   signInBtn: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: Radii.lg,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
+    backgroundColor: '#fff', borderRadius: Radii.lg,
+    paddingHorizontal: Spacing.lg, paddingVertical: Spacing.sm,
   },
-  signInText: {
-    color: Colors.accentViolet,
-    fontSize: Typography.sm,
-    fontWeight: FontWeight.bold,
+  signInText: { color: Colors.primaryOrange, fontSize: Typography.sm, fontWeight: FontWeight.bold },
+  menuSection: {
+    width: '100%', backgroundColor: Colors.surface, borderRadius: Radii.xl,
+    overflow: 'hidden', marginBottom: Spacing.md,
+    borderWidth: 1, borderColor: Colors.surfaceBorder,
   },
-  profileRow: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: Radii.xl,
-    padding: Spacing.lg,
-    marginBottom: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
-  },
-  profileRowDisabled: { opacity: 0.45 },
-  profileRowLeft: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  profileDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: Colors.accentOrange,
-  },
-  profileDotDisabled: { backgroundColor: 'rgba(255,255,255,0.2)' },
-  profileRowTitle: {
-    color: '#FFFFFF',
-    fontSize: Typography.base,
-    fontWeight: FontWeight.semibold,
-  },
-  profileRowHint: {
-    color: 'rgba(255,255,255,0.35)',
-    fontSize: Typography.xs,
-    marginTop: 2,
-  },
-  disabledText: { color: 'rgba(255,255,255,0.35)' },
   menuRow: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: Radii.xl,
-    padding: Spacing.lg,
-    marginBottom: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg, paddingVertical: Spacing.lg,
   },
-  menuRowText: {
-    color: '#FFFFFF',
-    fontSize: Typography.base,
-    fontWeight: FontWeight.semibold,
+  menuRowText: { color: Colors.textPrimary, fontSize: Typography.base, fontWeight: FontWeight.semibold },
+  separator: { height: 1, backgroundColor: Colors.surfaceBorder, marginHorizontal: Spacing.lg },
+  profileRow: {
+    width: '100%', padding: Spacing.lg, backgroundColor: Colors.surface,
+    borderRadius: Radii.xl, borderWidth: 1, borderColor: Colors.surfaceBorder,
   },
+  profileRowDisabled: { opacity: 0.5 },
+  profileRowTitle: { color: Colors.textPrimary, fontSize: Typography.base, fontWeight: FontWeight.semibold },
+  profileRowHint: { color: Colors.textTertiary, fontSize: Typography.xs, marginTop: 2 },
 });

@@ -1,174 +1,444 @@
 import type { Peptide } from '../types';
 
-export const PEPTIDES: Peptide[] = [
-  // ── Recovery & Healing ─────────────────────────────────────────────────────
+// Extended peptide type with rich content for detail screens
+export interface PeptideExtended extends Peptide {
+  alsoKnownAs?: string;
+  tagline: string;
+  overview: string;
+  whoIsThisFor: string[];
+  weekByWeek: { week: string; outcome: string }[];
+  safety: { grade: 'A' | 'B' | 'C'; label: string; description: string; sideEffects: string[]; };
+  typicalWeeklyCost: string;
+  costPerMg: string;
+  howToDose: string;
+  cycle: string;
+  tip?: string;
+  sources?: string[];
+  requiresTitration?: boolean;
+  titrationNote?: string;
+  categoryColor?: string;
+}
+
+export const PEPTIDES: PeptideExtended[] = [
+  // ── Recovery & Healing ──────────────────────────────────────────────────────
   {
     id: 'bpc-157',
     name: 'BPC-157',
     category: 'Recovery & Healing',
+    alsoKnownAs: 'Body Protective Compound 157',
     description: 'A pentadecapeptide derived from human gastric juice with remarkable regenerative properties.',
+    tagline: '"The most versatile healing peptide — tendons, gut, nerves, and beyond."',
+    overview: 'BPC-157 is a synthetic peptide derived from a protein found in human gastric juice. It has demonstrated broad regenerative activity in animal models, accelerating healing of tendons, ligaments, muscle, gut lining, and even nervous tissue. Many users report dramatically reduced recovery time from injuries.',
     mechanism: 'Upregulates growth hormone receptors, promotes angiogenesis, and activates the FAK-paxillin pathway to accelerate tendon and ligament healing.',
     typicalDose: '250–500',
     doseUnit: 'mcg',
     relatedGoals: ['injury-recovery', 'gut-health', 'joint-health'],
     popularIn: ['Match my goal', 'Curated combos'],
+    whoIsThisFor: ['Athletes recovering from tendon or ligament injuries', 'People with gut issues like IBS or leaky gut', 'Anyone seeking faster post-surgery recovery', 'Those with chronic joint pain or inflammation'],
+    weekByWeek: [
+      { week: 'Week 1', outcome: 'Reduced inflammation and pain at injury site' },
+      { week: 'Week 2–3', outcome: 'Noticeable improvement in range of motion' },
+      { week: 'Week 4+', outcome: 'Significant tissue regeneration, sustained healing' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'BPC-157 has an exceptionally clean safety record in animal studies with no known toxic dose established.',
+      sideEffects: ['Mild injection site discomfort', 'Occasional nausea (rare)', 'Dizziness at high doses (rare)'],
+    },
+    typicalWeeklyCost: '~$28',
+    costPerMg: '~$5.60/mg',
+    howToDose: '250–500 mcg once or twice daily (subcutaneous or IM)',
+    cycle: '4–8 weeks on, 2–4 weeks off',
+    tip: 'Inject near the injury site for localized effects, or systemically for gut healing.',
+    sources: ['Chang CH et al. (2011) Growth factor expression in BPC-157-treated tendons. J Orthop Res', 'Sikiric P et al. (2018) Stable gastric pentadecapeptide BPC 157. Curr Pharm Des'],
   },
   {
     id: 'tb-500',
     name: 'TB-500',
     category: 'Recovery & Healing',
+    alsoKnownAs: 'Thymosin Beta-4 Synthetic Fragment',
     description: 'Synthetic version of Thymosin Beta-4, a naturally occurring peptide that promotes healing and reduces inflammation.',
+    tagline: '"Systemic healing — works from the inside out."',
+    overview: 'TB-500 is a synthetic analogue of the naturally occurring peptide Thymosin Beta-4. Unlike BPC-157 which works locally, TB-500 distributes systemically, making it ideal for injuries that are hard to inject near directly.',
     mechanism: 'Regulates actin polymerization, promotes cell migration, and reduces inflammation by blocking NF-κB signalling.',
     typicalDose: '2–5',
     doseUnit: 'mg',
     relatedGoals: ['injury-recovery', 'inflammation', 'muscle-repair'],
     popularIn: ['Expert protocols', 'Curated combos'],
+    whoIsThisFor: ['Athletes with systemic inflammation', 'People recovering from multiple injuries', 'Those stacking with BPC-157 for maximum recovery', 'Anyone with chronic muscle tears or strains'],
+    weekByWeek: [
+      { week: 'Week 1–2', outcome: 'Systemic anti-inflammatory effects begin' },
+      { week: 'Week 3–4', outcome: 'Improved flexibility and reduced chronic pain' },
+      { week: 'Week 5–8', outcome: 'Sustained tissue repair and resilience' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'Well-tolerated in animal studies. No significant adverse effects reported at therapeutic doses.',
+      sideEffects: ['Injection site reactions', 'Fatigue (temporary)', 'Head rush if injected too quickly (IV route only)'],
+    },
+    typicalWeeklyCost: '~$35',
+    costPerMg: '~$7/mg',
+    howToDose: '2–2.5 mg twice weekly during loading phase, then once weekly',
+    cycle: '8–12 weeks loading, then maintenance',
+    tip: 'Often stacked with BPC-157 for a synergistic recovery effect.',
   },
   {
     id: 'ghk-cu',
     name: 'GHK-Cu',
     category: 'Skin & Aesthetics',
+    alsoKnownAs: 'Copper Peptide GHK',
     description: 'A naturally occurring copper peptide complex with potent wound healing and anti-aging effects.',
+    tagline: '"Turn back the clock — collagen, elastin, and glowing skin."',
+    overview: 'GHK-Cu is a naturally occurring copper peptide that has been shown to activate over 4,000 human genes involved in tissue repair. It stimulates collagen synthesis, has antioxidant properties, and has demonstrated remarkable anti-aging effects on skin.',
     mechanism: 'Activates over 4,000 genes related to tissue repair, stimulates collagen synthesis, and has antioxidant properties.',
     typicalDose: '1–2',
     doseUnit: 'mg',
     relatedGoals: ['skin-health', 'anti-aging', 'wound-healing'],
     popularIn: ['Skin protocols'],
+    whoIsThisFor: ['People seeking anti-aging skin improvements', 'Anyone with scars or wound healing needs', 'Those wanting to reduce fine lines and wrinkles', 'People experiencing hair loss or thinning'],
+    weekByWeek: [
+      { week: 'Week 1–2', outcome: 'Skin hydration and glow improvement' },
+      { week: 'Week 3–4', outcome: 'Visible reduction in fine lines' },
+      { week: 'Week 6–8', outcome: 'Significant collagen remodeling and firmness' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'GHK-Cu is a naturally occurring peptide with an excellent safety record. Topical use is very well established.',
+      sideEffects: ['Mild skin irritation (topical)', 'Temporary redness at injection site', 'Blue/green skin discoloration with overdose (rare)'],
+    },
+    typicalWeeklyCost: '~$22',
+    costPerMg: '~$5.96/mg',
+    howToDose: '1–2 mg daily (subcutaneous) or topical application',
+    cycle: '8–12 weeks, can be used ongoing',
+    tip: 'Topical GHK-Cu is effective for skin. Injectable is preferred for systemic anti-aging effects.',
   },
-
-  // ── Fat Loss ───────────────────────────────────────────────────────────────
+  // ── Fat Loss ────────────────────────────────────────────────────────────────
   {
     id: 'aod-9604',
     name: 'AOD-9604',
     category: 'Fat Loss',
     description: 'A modified fragment of human growth hormone specifically targeting fat metabolism.',
+    tagline: '"Fat loss without the GH side effects."',
+    overview: 'AOD-9604 is a modified fragment (amino acids 176-191) of human growth hormone. It targets fat metabolism specifically without affecting blood sugar or IGF-1 levels.',
     mechanism: 'Stimulates lipolysis and inhibits lipogenesis by mimicking the lipolytic activity of HGH without affecting IGF-1 levels or blood sugar.',
     typicalDose: '250–300',
     doseUnit: 'mcg',
     relatedGoals: ['fat-loss', 'body-composition'],
     popularIn: ['Fat loss stacks'],
+    whoIsThisFor: ['People wanting fat loss without full HGH risks', 'Those stuck at a weight loss plateau', 'People with stubborn belly fat', 'Those wanting body recomposition'],
+    weekByWeek: [
+      { week: 'Week 1–2', outcome: 'Metabolic shift begins, energy improves' },
+      { week: 'Week 3–4', outcome: 'Visible fat loss, especially visceral' },
+      { week: 'Week 5–8', outcome: 'Sustained fat oxidation and body composition changes' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'AOD-9604 does not affect blood glucose or IGF-1, making it much safer than full HGH.',
+      sideEffects: ['Mild injection site reactions', 'Temporary fatigue', 'Headache (rare)'],
+    },
+    typicalWeeklyCost: '~$18',
+    costPerMg: '~$3.50/mg',
+    howToDose: '250–300 mcg once daily, fasted (morning preferred)',
+    cycle: '12–16 weeks',
+    tip: 'Best taken on an empty stomach — avoid eating 30 min before and after injection.',
   },
   {
     id: 'cjc-1295',
     name: 'CJC-1295',
     category: 'Fat Loss',
+    alsoKnownAs: 'CJC-1295 with DAC',
     description: 'A long-acting GHRH analogue that elevates growth hormone and IGF-1 levels.',
-    mechanism: 'Binds to albumin via a DAC (Drug Affinity Complex) to extend its half-life, providing sustained GH pulse stimulation.',
+    tagline: '"Sustained GH elevation for fat loss, muscle, and sleep."',
+    overview: 'CJC-1295 is a growth hormone releasing hormone analogue with a Drug Affinity Complex (DAC) that extends its half-life dramatically. It produces sustained GH elevation rather than pulses, making it ideal for body composition goals.',
+    mechanism: 'Binds to albumin via DAC to extend half-life, providing sustained GH pulse stimulation for days rather than hours.',
     typicalDose: '100–300',
     doseUnit: 'mcg',
     relatedGoals: ['fat-loss', 'muscle-growth', 'anti-aging'],
     popularIn: ['GH stacks'],
+    whoIsThisFor: ['Adults over 30 with declining GH levels', 'Those wanting simultaneous fat loss and muscle gain', 'People with poor sleep quality', 'Anyone wanting anti-aging benefits'],
+    weekByWeek: [
+      { week: 'Week 1–2', outcome: 'Improved sleep quality and recovery' },
+      { week: 'Week 3–4', outcome: 'Noticeable body composition shifts begin' },
+      { week: 'Week 8–12', outcome: 'Significant fat loss and lean mass improvement' },
+    ],
+    safety: {
+      grade: 'B',
+      label: 'Good Safety Profile',
+      description: 'Well-tolerated but can cause water retention and numbness/tingling in hands.',
+      sideEffects: ['Water retention', 'Tingling in hands/feet', 'Insulin resistance if overused', 'Flushing'],
+    },
+    typicalWeeklyCost: '~$25',
+    costPerMg: '~$8/mg',
+    howToDose: '100–200 mcg 1–2x per week (with DAC) or 100 mcg daily (no DAC version)',
+    cycle: '12–16 weeks, then 4+ week break',
+    tip: 'Almost always stacked with Ipamorelin for synergistic GH release.',
   },
   {
     id: 'ipamorelin',
     name: 'Ipamorelin',
     category: 'Fat Loss',
     description: 'A selective GH secretagogue with minimal side effects, often paired with CJC-1295.',
+    tagline: '"Clean GH pulse — no cortisol, no prolactin."',
+    overview: 'Ipamorelin is considered the gold standard GH secretagogue because it produces a clean GH pulse without raising cortisol or prolactin — the two main unwanted effects of other GH secretagogues.',
     mechanism: 'Acts as a ghrelin mimetic at GHS-R1a receptors, triggering a clean GH pulse without significantly raising cortisol or prolactin.',
     typicalDose: '200–300',
     doseUnit: 'mcg',
     relatedGoals: ['fat-loss', 'sleep', 'recovery'],
     popularIn: ['GH stacks', 'Sleep protocols'],
+    whoIsThisFor: ['Those wanting GH benefits without side effects', 'People prioritizing sleep quality', 'Athletes seeking recovery optimization', 'Anyone stacking with CJC-1295'],
+    weekByWeek: [
+      { week: 'Week 1', outcome: 'Noticeably deeper sleep' },
+      { week: 'Week 2–4', outcome: 'Improved recovery, less soreness' },
+      { week: 'Week 5–8', outcome: 'Body composition changes become visible' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'One of the safest GH secretagogues. Does not significantly raise cortisol or prolactin.',
+      sideEffects: ['Mild water retention', 'Hunger increase', 'Injection site reactions'],
+    },
+    typicalWeeklyCost: '~$20',
+    costPerMg: '~$4/mg',
+    howToDose: '200–300 mcg 1–3x daily (before bed is most effective)',
+    cycle: '12–16 weeks',
+    tip: 'Take on an empty stomach. Avoid carbs 30 min before and after for best GH response.',
   },
-
-  // ── Muscle & Performance ──────────────────────────────────────────────────
+  // ── Muscle & Performance ────────────────────────────────────────────────────
   {
     id: 'igf-1-lr3',
     name: 'IGF-1 LR3',
     category: 'Muscle & Performance',
     description: 'A long-acting analogue of insulin-like growth factor 1 that potently stimulates muscle hypertrophy.',
+    tagline: '"The muscle builder — satellite cell activation and hypertrophy."',
+    overview: 'IGF-1 LR3 is a modified form of IGF-1 with an extended half-life. It is one of the most anabolic peptides available, directly stimulating muscle growth at the cellular level.',
     mechanism: 'Binds IGF-1 receptors with higher affinity than native IGF-1, promoting satellite cell activation and protein synthesis while inhibiting apoptosis.',
     typicalDose: '20–50',
     doseUnit: 'mcg',
     relatedGoals: ['muscle-growth', 'fat-loss', 'performance'],
     popularIn: ['Muscle protocols'],
+    whoIsThisFor: ['Advanced athletes seeking maximum muscle growth', 'Those who have plateaued on traditional training', 'Bodybuilders in building phase', 'People recovering from muscle injuries'],
+    weekByWeek: [
+      { week: 'Week 1', outcome: 'Increased pump and fullness in muscles' },
+      { week: 'Week 2–3', outcome: 'Noticeable strength gains and recovery speed' },
+      { week: 'Week 4–6', outcome: 'Visible lean mass increases' },
+    ],
+    safety: {
+      grade: 'B',
+      label: 'Good Safety Profile with Caution',
+      description: 'Effective but requires careful dosing. Can cause hypoglycemia at high doses.',
+      sideEffects: ['Hypoglycemia (if dose too high)', 'Jaw/organ growth with prolonged overuse', 'Joint pain', 'Carpal tunnel symptoms'],
+    },
+    typicalWeeklyCost: '~$45',
+    costPerMg: '~$22/mg',
+    howToDose: '20–50 mcg post-workout (IM into trained muscle)',
+    cycle: '4–6 weeks maximum, then 6–8 week break',
+    tip: 'Always have fast-acting carbs available when dosing due to hypoglycemia risk.',
   },
   {
     id: 'follistatin-344',
     name: 'Follistatin-344',
     category: 'Muscle & Performance',
     description: 'An activin-binding protein that suppresses myostatin, enabling significant muscle growth.',
+    tagline: '"Remove the brake on muscle growth."',
+    overview: 'Follistatin-344 inhibits myostatin — the protein that limits how much muscle your body can build. By suppressing this natural brake, Follistatin-344 can enable muscle growth beyond natural limits.',
     mechanism: 'Inhibits myostatin and other TGF-β superfamily members, removing the natural brake on muscle hypertrophy.',
     typicalDose: '50–100',
     doseUnit: 'mcg',
     relatedGoals: ['muscle-growth', 'performance'],
     popularIn: ['Elite muscle protocols'],
+    whoIsThisFor: ['Advanced bodybuilders and athletes', 'Those with naturally high myostatin levels', 'People wanting extraordinary muscle gains', 'Strength athletes at a plateau'],
+    weekByWeek: [
+      { week: 'Week 1–2', outcome: 'Increased training capacity and endurance' },
+      { week: 'Week 3–4', outcome: 'Rapid muscle fullness and hypertrophy' },
+      { week: 'Week 5+', outcome: 'Significant strength and size gains' },
+    ],
+    safety: {
+      grade: 'C',
+      label: 'Use with Caution',
+      description: 'Limited human data. Powerful compound — start at lower doses.',
+      sideEffects: ['Potential for organ enlargement with overuse', 'Injection site reactions', 'Unknown long-term effects'],
+    },
+    typicalWeeklyCost: '~$80',
+    costPerMg: '~$16/mg',
+    howToDose: '50–100 mcg every other day (intramuscular)',
+    cycle: '10–20 days on, then significant break',
+    tip: 'Used responsibly and in short cycles. Not recommended for beginners.',
   },
-
-  // ── Cognitive & Neuroprotection ────────────────────────────────────────────
+  // ── Cognitive & Neuroprotection ─────────────────────────────────────────────
   {
     id: 'semax',
     name: 'Semax',
     category: 'Cognitive & Neuroprotection',
     description: 'A synthetic peptide derived from ACTH with potent nootropic and neuroprotective effects.',
+    tagline: '"Russian military nootropic — sharper, faster, clearer."',
+    overview: 'Semax is a synthetic peptide originally developed in Russia for stroke treatment. It has since become popular as a cognitive enhancer due to its ability to increase BDNF, improve focus, and provide neuroprotective effects.',
     mechanism: 'Increases BDNF and NGF expression, modulates dopaminergic and serotonergic systems, and provides antioxidant neuroprotection.',
     typicalDose: '100–600',
     doseUnit: 'mcg',
     relatedGoals: ['cognition', 'focus', 'neuroprotection'],
     popularIn: ['Cognitive stacks'],
+    whoIsThisFor: ['Knowledge workers needing sustained focus', 'Students studying for exams', 'People with brain fog or cognitive decline', 'Those recovering from neurological issues'],
+    weekByWeek: [
+      { week: 'Day 1–3', outcome: 'Noticeable increase in focus and mental energy' },
+      { week: 'Week 1–2', outcome: 'Improved memory formation and recall' },
+      { week: 'Week 3–4', outcome: 'Sustained cognitive enhancement and mood improvement' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'Extensively studied in Russia. Well-tolerated with no serious adverse effects.',
+      sideEffects: ['Mild irritability (first few days)', 'Vivid dreams', 'Appetite suppression'],
+    },
+    typicalWeeklyCost: '~$30',
+    costPerMg: '~$10/mg',
+    howToDose: '100–300 mcg intranasal or subcutaneous, 1–2x daily',
+    cycle: '2–4 weeks on, 2 weeks off',
+    tip: 'Intranasal administration works fastest. Start at 100 mcg to assess tolerance.',
   },
   {
     id: 'selank',
     name: 'Selank',
     category: 'Cognitive & Neuroprotection',
     description: 'An anxiolytic peptide with nootropic properties, derived from tuftsin.',
+    tagline: '"Calm focus without sedation or dependency."',
+    overview: 'Selank is an anxiolytic peptide that provides anxiety relief without the sedation or dependence of traditional medications. It also has notable nootropic properties, improving focus and mood simultaneously.',
     mechanism: 'Modulates GABA-A receptors and increases BDNF, producing anxiolytic effects without sedation or dependency.',
     typicalDose: '250–500',
     doseUnit: 'mcg',
     relatedGoals: ['anxiety', 'cognition', 'stress'],
     popularIn: ['Cognitive stacks', 'Stress protocols'],
+    whoIsThisFor: ['People with anxiety or chronic stress', 'Those wanting calm focus without sedation', 'People tapering off benzodiazepines', 'Anyone wanting mood + cognition improvement'],
+    weekByWeek: [
+      { week: 'Day 1', outcome: 'Immediate anxiety reduction and mental calm' },
+      { week: 'Week 1–2', outcome: 'Improved focus and mood stability' },
+      { week: 'Week 3–4', outcome: 'Reduced baseline anxiety and better stress resilience' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'No dependency or tolerance development. One of the safest anxiolytics studied.',
+      sideEffects: ['Mild sedation at high doses', 'Nasal irritation (intranasal)', 'Vivid dreams'],
+    },
+    typicalWeeklyCost: '~$25',
+    costPerMg: '~$5/mg',
+    howToDose: '250–500 mcg intranasal or subcutaneous, 1–3x daily',
+    cycle: '2–4 weeks on, 2 weeks off (or as needed)',
+    tip: 'Pairs exceptionally well with Semax — the two together cover focus AND anxiety.',
   },
-
-  // ── Sleep & Longevity ─────────────────────────────────────────────────────
+  // ── Sleep & Longevity ────────────────────────────────────────────────────────
   {
     id: 'epithalon',
     name: 'Epithalon',
     category: 'Sleep & Longevity',
+    alsoKnownAs: 'Epitalon / Epithalamin',
     description: 'A tetrapeptide that activates telomerase and regulates the pineal gland, showing remarkable anti-aging effects.',
+    tagline: '"Reverse cellular aging — telomere repair and deep sleep."',
+    overview: 'Epithalon (Epitalon) is a tetrapeptide that works by activating telomerase, the enzyme responsible for repairing and lengthening telomeres. Shorter telomeres are associated with aging and disease. It also normalizes melatonin synthesis via the pineal gland.',
     mechanism: 'Activates telomerase to elongate telomeres, normalises melatonin synthesis, and reduces oxidative stress markers.',
     typicalDose: '5–10',
     doseUnit: 'mg',
     relatedGoals: ['longevity', 'sleep', 'anti-aging'],
     popularIn: ['Longevity protocols'],
+    whoIsThisFor: ['Anyone interested in longevity optimization', 'People with poor sleep quality', 'Those concerned about cellular aging', 'Biohackers doing an annual anti-aging protocol'],
+    weekByWeek: [
+      { week: 'Days 1–3', outcome: 'Improved sleep depth and vivid dreams' },
+      { week: 'Week 1–2', outcome: 'Increased energy and sense of wellbeing' },
+      { week: 'Months 1–3', outcome: 'Cellular renewal and anti-aging effects (longer-term)' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'Extensively studied in Russia over decades. No significant adverse effects at therapeutic doses.',
+      sideEffects: ['Injection site reactions', 'Vivid dreams (usually considered positive)', 'Mild fatigue initially'],
+    },
+    typicalWeeklyCost: '~$40',
+    costPerMg: '~$4/mg',
+    howToDose: '5–10 mg daily for 10–20 days, once or twice yearly',
+    cycle: '10–20 day course, then 4–6 month break',
+    tip: 'Most protocols run 10 days straight once or twice per year for longevity benefits.',
   },
   {
     id: 'dsip',
     name: 'DSIP',
     category: 'Sleep & Longevity',
+    alsoKnownAs: 'Delta Sleep-Inducing Peptide',
     description: 'Delta Sleep-Inducing Peptide — a natural neuromodulator that improves deep sleep quality.',
+    tagline: '"Deep delta-wave sleep, every night."',
+    overview: 'DSIP is a naturally occurring nonapeptide that promotes delta-wave (deep) sleep. Unlike sedative sleep aids, it works with your natural sleep architecture rather than forcing sedation.',
     mechanism: 'Modulates the hypothalamic-pituitary axis and promotes delta-wave sleep by regulating stress hormones.',
     typicalDose: '100–300',
     doseUnit: 'mcg',
     relatedGoals: ['sleep', 'recovery', 'stress'],
     popularIn: ['Sleep protocols'],
+    whoIsThisFor: ['People with insomnia or poor sleep quality', 'Those wanting deeper, more restorative sleep', 'People under high stress', 'Anyone wanting to optimize recovery through sleep'],
+    weekByWeek: [
+      { week: 'Night 1', outcome: 'Noticeable improvement in sleep depth' },
+      { week: 'Week 1–2', outcome: 'More consistent deep sleep phases' },
+      { week: 'Week 3–4', outcome: 'Reduced cortisol, better morning energy' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'No dependency, no morning grogginess. Works with natural sleep architecture.',
+      sideEffects: ['Vivid dreams', 'Slight grogginess if dose is too high', 'Injection site reactions'],
+    },
+    typicalWeeklyCost: '~$15',
+    costPerMg: '~$0.75/mg',
+    howToDose: '100–300 mcg subcutaneous, 30–60 minutes before bed',
+    cycle: '2–4 weeks as needed or ongoing',
+    tip: 'Take exactly 30 minutes before target sleep time. Dimming lights helps potentiate the effect.',
   },
-
-  // ── GI & Gut Health ───────────────────────────────────────────────────────
+  // ── GI & Gut Health ──────────────────────────────────────────────────────────
   {
     id: 'kpv',
     name: 'KPV',
     category: 'GI & Gut Health',
+    alsoKnownAs: 'Lysine-Proline-Valine',
     description: 'A tripeptide derived from alpha-MSH with potent anti-inflammatory and gut-healing properties.',
+    tagline: '"Anti-inflammatory tripeptide for gut healing and skin."',
+    overview: 'KPV is a tripeptide (Lys-Pro-Val) derived from the C-terminal of alpha-melanocyte stimulating hormone (alpha-MSH). It has potent anti-inflammatory effects in gut tissue and has shown promise for inflammatory bowel conditions.',
     mechanism: 'Inhibits NF-κB signalling and pro-inflammatory cytokines in intestinal epithelial cells, reducing gut permeability.',
-    typicalDose: '250–500',
+    typicalDose: '200–500',
     doseUnit: 'mcg',
     relatedGoals: ['gut-health', 'inflammation', 'leaky-gut'],
     popularIn: ['Gut healing stacks'],
+    whoIsThisFor: ['People with IBS, IBD, or Crohn\'s disease', 'Those with leaky gut or food sensitivities', 'Anyone with chronic gut inflammation', 'People seeking skin inflammation reduction'],
+    weekByWeek: [
+      { week: 'Week 1', outcome: 'Reduced gut discomfort and bloating' },
+      { week: 'Week 1–3', outcome: 'Improved gut comfort and regularity' },
+      { week: 'Week 4+', outcome: 'Sustained gut lining repair and reduced reactivity' },
+    ],
+    safety: {
+      grade: 'A',
+      label: 'Excellent Safety Profile',
+      description: 'Naturally derived peptide with minimal systemic effects. Oral formulation is safe for gut targeting.',
+      sideEffects: ['Injection site reactions (injectable)', 'Mild nausea (rare)', 'Headache (rare)'],
+    },
+    typicalWeeklyCost: '~$22',
+    costPerMg: '~$5.96/mg',
+    howToDose: '200–500 mcg daily (injectable or oral for gut targeting)',
+    cycle: '4–8 weeks or as needed',
+    tip: 'Oral formulations target gut inflammation directly; injectable is better for systemic effects.',
+    sources: ['Catania A et al. Anti-inflammatory properties of alpha-MSH. PNAS', 'Kannengiesser K et al. KPV and intestinal inflammation. J Crohn\'s Colitis'],
   },
 ];
 
-export function getPeptideById(id: string): Peptide | undefined {
+export function getPeptideById(id: string): PeptideExtended | undefined {
   return PEPTIDES.find((p) => p.id === id);
 }
 
-export function getPeptidesByCategory(category: Peptide['category']): Peptide[] {
+export function getPeptidesByCategory(category: PeptideExtended['category']): PeptideExtended[] {
   return PEPTIDES.filter((p) => p.category === category);
 }
 
-export function getPeptidesByGoal(goal: string): Peptide[] {
+export function getPeptidesByGoal(goal: string): PeptideExtended[] {
   return PEPTIDES.filter((p) => p.relatedGoals.includes(goal));
 }
 
 export const PEPTIDE_CATEGORIES = [
   ...new Set(PEPTIDES.map((p) => p.category)),
-] as Peptide['category'][];
+] as PeptideExtended['category'][];
