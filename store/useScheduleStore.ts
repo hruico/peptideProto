@@ -1,3 +1,12 @@
+// ─── useScheduleStore.ts ──────────────────────────────────────────────────────
+// Manages the user's active peptide schedules and dose-taken history.
+//
+// Key design decisions:
+//   - Each ScheduledPeptide has an id, so multiple peptides can coexist
+//   - takenDoses uses string keys: `${peptideId}-${date}-${time}` to uniquely
+//     identify each dose instance without a separate log table
+//   - Persisted via AsyncStorage so schedules survive app restarts
+// ─────────────────────────────────────────────────────────────────────────────
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';

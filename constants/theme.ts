@@ -1,3 +1,10 @@
+// ─── theme.ts ─────────────────────────────────────────────────────────────────
+// Single source of truth for all design tokens.
+// Deep dark navy palette matching the actual app design.
+//
+// Usage: import { Colors, Spacing, Radii, Typography, FontWeight } from '../constants/theme'
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Design tokens — The Peptide App
 // Deep dark navy theme matching the actual app screenshots
 

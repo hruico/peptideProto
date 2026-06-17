@@ -1,3 +1,11 @@
+// ─── useOnboardingStore.ts ────────────────────────────────────────────────────
+// Tracks onboarding state. The most critical field is `hasCompletedOnboarding`
+// which the root _layout.tsx checks on every launch to decide whether to show
+// the onboarding flow or go straight to tabs.
+//
+// Reset flow: calling resetOnboarding() sets hasCompletedOnboarding = false,
+// which causes the root layout useEffect to redirect to /onboarding/splash.
+// ─────────────────────────────────────────────────────────────────────────────
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';

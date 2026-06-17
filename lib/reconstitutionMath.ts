@@ -1,3 +1,13 @@
+// ─── reconstitutionMath.ts ────────────────────────────────────────────────────
+// Pure calculation functions for the reconstitution calculator.
+// No React imports — these are unit-testable standalone functions.
+//
+// Core formula:
+//   concentration (mcg/mL) = vialAmount (mcg) / BACwater (mL)
+//   drawVolume (mL)        = desiredDose (mcg) / concentration (mcg/mL)
+//   syringeUnits           = drawVolume (mL) * 100
+//   (because a standard U-100 insulin syringe = 100 units per 1 mL)
+// ─────────────────────────────────────────────────────────────────────────────
 import type {
   ReconstitutionInput,
   PreMixedInput,
