@@ -10,6 +10,7 @@ import protocolsRouter from './routes/protocols';
 import scheduleRouter from './routes/schedule';
 import vialsRouter from './routes/vials';
 import trackingRouter from './routes/tracking';
+import catalogRouter from './routes/catalog';
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use('/protocols', protocolsRouter);
 app.use('/schedule', scheduleRouter);
 app.use('/vials', vialsRouter);
 app.use('/tracking', trackingRouter);
+app.use('/catalog', catalogRouter);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 
