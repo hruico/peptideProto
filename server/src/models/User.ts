@@ -3,7 +3,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 export interface IUser extends Document {
   displayName?: string;
   email?: string;
-  provider: 'google' | 'apple' | 'guest';
+  provider: 'google' | 'guest';
   providerId?: string;       // OAuth subject / sub
   isGuest: boolean;
   createdAt: Date;
@@ -23,7 +23,7 @@ const UserSchema = new Schema<IUser>(
   {
     displayName: { type: String },
     email: { type: String, lowercase: true, trim: true },
-    provider: { type: String, enum: ['google', 'apple', 'guest'], required: true },
+    provider: { type: String, enum: ['google', 'guest'], required: true },
     providerId: { type: String },
     isGuest: { type: Boolean, default: false },
     onboarding: {

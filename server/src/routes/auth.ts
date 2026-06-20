@@ -5,7 +5,6 @@ import { signToken } from '../middleware/auth';
 
 const router = Router();
 
-// Helper — redirect back to the app with a JWT
 function redirectWithToken(res: Response, user: IUser): void {
   const id = (user._id as unknown as { toString(): string }).toString();
   const token = signToken(id);
@@ -19,17 +18,6 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 router.get(
   '/google/callback',
   passport.authenticate('google', { session: false, failureRedirect: '/auth/failure' }),
-  (req: Request, res: Response) => {
-    redirectWithToken(res, req.user as IUser);
-  }
-);
-
-// ── Apple ─────────────────────────────────────────────────────────────────────
-router.get('/apple', passport.authenticate('apple', { session: false }));
-
-router.post(
-  '/apple/callback',
-  passport.authenticate('apple', { session: false, failureRedirect: '/auth/failure' }),
   (req: Request, res: Response) => {
     redirectWithToken(res, req.user as IUser);
   }

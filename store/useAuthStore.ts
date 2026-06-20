@@ -66,9 +66,8 @@ export const useAuthStore = create<AuthState>()(
 );
 
 /**
- * Returns the OAuth redirect URLs so screens can open them in a browser.
+ * Returns the OAuth redirect URL so screens can open it in a browser.
  */
 export const oauthUrls = {
   google: `${BASE_URL}/auth/google`,
-  apple: `${BASE_URL}/auth/apple`,
 };
