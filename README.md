@@ -8,7 +8,6 @@
 
 A mobile app that helps users discover, schedule, and track peptide protocols. Think of it as a "fitness app for biohackers" — guiding users from zero knowledge to a personalised dosing schedule with reconstitution calculators, outcome tracking, and expert protocol libraries.
 
-Built in ~4 weeks as a solo project using Expo + React Native.
 
 ---
 
