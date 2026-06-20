@@ -4,13 +4,21 @@ import { X, User, ChevronRight } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
 import { format } from 'date-fns';
 import { useUserStore } from '../../store/useUserStore';
+import { useAuthStore, oauthUrls } from '../../store/useAuthStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import * as WebBrowser from 'expo-web-browser';
 
 export default function AccountScreen() {
-  const { user, isGuest, signIn } = useUserStore();
+  const { user } = useUserStore();
+  const { token, signOut } = useAuthStore();
+  const isGuest = !token || (user?.isGuest ?? true);
   const memberYear = user?.createdAt
     ? format(new Date(user.createdAt), 'yyyy')
     : new Date().getFullYear().toString();
+
+  async function handleSignIn() {
+    await WebBrowser.openBrowserAsync(oauthUrls.google);
+  }
 
   return (
     <View style={styles.container}>
@@ -39,7 +47,7 @@ export default function AccountScreen() {
               <Text style={styles.saveCardTitle}>Save Your Account</Text>
               <Text style={styles.saveCardSub}>Sync across devices</Text>
             </View>
-            <TouchableOpacity style={styles.signInBtn} onPress={() => signIn('Demo User')} activeOpacity={0.85}>
+            <TouchableOpacity style={styles.signInBtn} onPress={handleSignIn} activeOpacity={0.85}>
               <Text style={styles.signInText}>Sign In</Text>
             </TouchableOpacity>
           </View>

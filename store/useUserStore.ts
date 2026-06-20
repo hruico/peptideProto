@@ -1,60 +1,51 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiFetch } from '../lib/apiClient';
 import type { UserProfile } from '../types';
 
 interface UserState {
-  isGuest: boolean;
   user: UserProfile | null;
+  isLoading: boolean;
 
-  // Actions
-  continueAsGuest: () => void;
-  signIn: (displayName?: string) => void;
-  signOut: () => void;
-}
-
-function generateId(): string {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+  fetchProfile: () => Promise<void>;
+  updateDisplayName: (name: string) => Promise<void>;
+  clearProfile: () => void;
 }
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set, get) => ({
-      isGuest: true,
+    (set) => ({
       user: null,
+      isLoading: false,
 
-      continueAsGuest: () => {
-        // Only create a guest profile if one doesn't exist yet
-        if (!get().user) {
-          set({
-            isGuest: true,
-            user: {
-              id: generateId(),
-              createdAt: new Date().toISOString(),
-              isGuest: true,
-            },
-          });
+      fetchProfile: async () => {
+        set({ isLoading: true });
+        try {
+          const user = await apiFetch<UserProfile>('/user/me');
+          set({ user, isLoading: false });
+        } catch (err) {
+          console.warn('fetchProfile failed:', err);
+          set({ isLoading: false });
         }
       },
 
-      signIn: (displayName) =>
+      updateDisplayName: async (displayName) => {
         set((state) => ({
-          isGuest: false,
-          user: state.user
-            ? { ...state.user, displayName, isGuest: false }
-            : {
-                id: generateId(),
-                displayName,
-                createdAt: new Date().toISOString(),
-                isGuest: false,
-              },
-        })),
+          user: state.user ? { ...state.user, displayName } : null,
+        }));
+        try {
+          const user = await apiFetch<UserProfile>('/user/me', {
+            method: 'PATCH',
+            body: { displayName },
+          });
+          set({ user });
+        } catch (err) {
+          console.warn('updateDisplayName sync failed:', err);
+        }
+      },
 
-      signOut: () =>
-        set({
-          isGuest: true,
-          user: null,
-        }),
+      clearProfile: () => set({ user: null }),
     }),
     {
       name: 'user-storage',

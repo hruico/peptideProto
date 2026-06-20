@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { getGoalDetailById } from '../../data/goals';
 import { getProtocolById } from '../../data/protocols';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
-import { useUserStore } from '../../store/useUserStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
 export default function WeFoundOneScreen() {
@@ -14,7 +14,7 @@ export default function WeFoundOneScreen() {
   const detail = getGoalDetailById(goalId);
   const protocol = detail?.recommendedProtocolId ? getProtocolById(detail.recommendedProtocolId) : null;
   const { completeOnboarding } = useOnboardingStore();
-  const { continueAsGuest } = useUserStore();
+  const { continueAsGuest } = useAuthStore();
 
   function handleLetsGo() {
     continueAsGuest();

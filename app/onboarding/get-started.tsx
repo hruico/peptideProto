@@ -5,7 +5,7 @@ import { X } from 'lucide-react-native';
 import * as Linking from 'expo-linking';
 import VerifiedExpertsCard from '../../components/cards/VerifiedExpertsCard';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
-import { useUserStore } from '../../store/useUserStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
 const DISCORD_URL = 'https://discord.gg/peptideapp';
@@ -43,7 +43,7 @@ const OPTIONS = [
 
 export default function GetStartedScreen() {
   const { setSelectedPath, completeOnboarding } = useOnboardingStore();
-  const { continueAsGuest } = useUserStore();
+  const { continueAsGuest } = useAuthStore();
 
   function handleOption(id: string, route: string | null) {
     setSelectedPath(id as any);

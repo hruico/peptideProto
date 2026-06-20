@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, ChevronRight, Bell, MessageSquare, HeartPulse, HelpCircle, FileText, RotateCcw } from 'lucide-react-native';
 import { useState } from 'react';
+import { useAuthStore } from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
 import { useScheduleStore } from '../../store/useScheduleStore';
@@ -17,7 +18,8 @@ export default function SettingsScreen() {
   const [confirmVisible, setConfirmVisible] = useState(false);
 
   const { resetOnboarding } = useOnboardingStore();
-  const { signOut } = useUserStore();
+  const { signOut } = useAuthStore();
+  const { clearProfile } = useUserStore();
   const { clearAll } = useScheduleStore();
   const { clearActivityLog, removeProtocol, myProtocols } = useProtocolStore();
   const { sessions, removeSession } = useTrackingStore();
@@ -27,10 +29,8 @@ export default function SettingsScreen() {
     clearActivityLog();
     [...myProtocols].forEach(p => removeProtocol(p.id));
     [...sessions].forEach(s => removeSession(s.id));
+    clearProfile();
     signOut();
-    // resetOnboarding sets hasCompletedOnboarding = false
-    // _layout.tsx useEffect watches that flag and redirects to splash automatically
-    // No need to call router.replace here — avoids double-navigation error
     resetOnboarding();
   }
 

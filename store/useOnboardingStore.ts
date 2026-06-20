@@ -1,14 +1,11 @@
 // ─── useOnboardingStore.ts ────────────────────────────────────────────────────
-// Tracks onboarding state. The most critical field is `hasCompletedOnboarding`
-// which the root _layout.tsx checks on every launch to decide whether to show
-// the onboarding flow or go straight to tabs.
-//
-// Reset flow: calling resetOnboarding() sets hasCompletedOnboarding = false,
-// which causes the root layout useEffect to redirect to /onboarding/splash.
+// Tracks onboarding state. On completion, also persists to backend via
+// PATCH /user/me/onboarding so the profile survives reinstalls.
 // ─────────────────────────────────────────────────────────────────────────────
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiFetch } from '../lib/apiClient';
 import type { Sex, AgeRange, OnboardingPath } from '../types';
 
 interface OnboardingState {
@@ -20,20 +17,19 @@ interface OnboardingState {
   interestReasons: string[];
   hasCompletedOnboarding: boolean;
 
-  // Actions
   setSex: (sex: Sex) => void;
   setAgeRange: (ageRange: AgeRange) => void;
   setSelectedPath: (path: OnboardingPath) => void;
   setGoal: (goal: string) => void;
   setInterestedPeptideId: (id: string) => void;
   setInterestReasons: (reasons: string[]) => void;
-  completeOnboarding: () => void;
+  completeOnboarding: () => Promise<void>;
   resetOnboarding: () => void;
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       sex: null,
       ageRange: null,
       selectedPath: null,
@@ -48,7 +44,28 @@ export const useOnboardingStore = create<OnboardingState>()(
       setGoal: (goal) => set({ goal }),
       setInterestedPeptideId: (interestedPeptideId) => set({ interestedPeptideId }),
       setInterestReasons: (interestReasons) => set({ interestReasons }),
-      completeOnboarding: () => set({ hasCompletedOnboarding: true }),
+
+      completeOnboarding: async () => {
+        set({ hasCompletedOnboarding: true });
+        const { sex, ageRange, selectedPath, goal, interestedPeptideId, interestReasons } = get();
+        try {
+          await apiFetch('/user/me/onboarding', {
+            method: 'PATCH',
+            body: {
+              sex,
+              ageRange,
+              selectedPath,
+              goal,
+              interestedPeptideId,
+              interestReasons,
+              hasCompleted: true,
+            },
+          });
+        } catch (err) {
+          console.warn('completeOnboarding sync failed:', err);
+        }
+      },
+
       resetOnboarding: () =>
         set({
           sex: null,

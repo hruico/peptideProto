@@ -1,12 +1,14 @@
 import '../global.css';
 
 import { useFonts } from 'expo-font';
-import { Stack, router } from 'expo-router';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useOnboardingStore } from '../store/useOnboardingStore';
+import { useAuthStore } from '../store/useAuthStore';
+import { useServerSync } from '../lib/useServerSync';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -36,6 +38,18 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const hasCompletedOnboarding = useOnboardingStore((s) => s.hasCompletedOnboarding);
+  const { token: authToken, userId, handleOAuthRedirect } = useAuthStore();
+
+  // Handle OAuth deep-link: exp://localhost?token=...&userId=...
+  const params = useLocalSearchParams<{ token?: string; userId?: string }>();
+  useEffect(() => {
+    if (params.token && params.userId) {
+      handleOAuthRedirect(params.token, params.userId);
+    }
+  }, [params.token, params.userId]);
+
+  // Sync all stores from server once token is available
+  useServerSync();
 
   useEffect(() => {
     if (!hasCompletedOnboarding) {

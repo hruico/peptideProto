@@ -5,7 +5,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, Check } from 'lucide-react-native';
 import GradientButton from '../../components/ui/GradientButton';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
-import { useUserStore } from '../../store/useUserStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { getPeptideById } from '../../data/peptides';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
@@ -24,7 +24,7 @@ const REASONS = [
 export default function InterestReasonScreen() {
   const { peptideId } = useLocalSearchParams<{ peptideId?: string }>();
   const { setInterestReasons, completeOnboarding } = useOnboardingStore();
-  const { continueAsGuest } = useUserStore();
+  const { continueAsGuest } = useAuthStore();
   const [selected, setSelected] = useState<string[]>([]);
 
   const peptide = peptideId ? getPeptideById(peptideId) : null;
