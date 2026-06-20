@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import passport from 'passport';
+import crypto from 'crypto';
 import { User, IUser } from '../models/User';
 import { signToken } from '../middleware/auth';
 
@@ -27,6 +28,7 @@ router.get(
 router.post('/guest', async (_req: Request, res: Response) => {
   const user = await User.create({
     provider: 'guest',
+    providerId: crypto.randomUUID(),
     isGuest: true,
   });
   const guestId = (user._id as unknown as { toString(): string }).toString();
