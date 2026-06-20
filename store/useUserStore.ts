@@ -4,6 +4,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiFetch } from '../lib/apiClient';
 import type { UserProfile } from '../types';
 
+interface ServerUser {
+  _id: string;
+  displayName?: string;
+  createdAt: string;
+  isGuest: boolean;
+}
+
 interface UserState {
   user: UserProfile | null;
   isLoading: boolean;
@@ -22,7 +29,13 @@ export const useUserStore = create<UserState>()(
       fetchProfile: async () => {
         set({ isLoading: true });
         try {
-          const user = await apiFetch<UserProfile>('/user/me');
+          const raw = await apiFetch<ServerUser>('/user/me');
+          const user: UserProfile = {
+            id: raw._id,
+            displayName: raw.displayName,
+            createdAt: raw.createdAt,
+            isGuest: raw.isGuest,
+          };
           set({ user, isLoading: false });
         } catch (err) {
           console.warn('fetchProfile failed:', err);
@@ -35,11 +48,11 @@ export const useUserStore = create<UserState>()(
           user: state.user ? { ...state.user, displayName } : null,
         }));
         try {
-          const user = await apiFetch<UserProfile>('/user/me', {
+          const raw = await apiFetch<ServerUser>('/user/me', {
             method: 'PATCH',
             body: { displayName },
           });
-          set({ user });
+          set({ user: { id: raw._id, displayName: raw.displayName, createdAt: raw.createdAt, isGuest: raw.isGuest } });
         } catch (err) {
           console.warn('updateDisplayName sync failed:', err);
         }

@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       userId: null,
-      isLoading: false,
+      isLoading: true,
       error: null,
 
       continueAsGuest: async () => {
@@ -59,8 +59,10 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      // Only persist token + userId — not transient loading/error state
       partialize: (state) => ({ token: state.token, userId: state.userId }),
+      onRehydrateStorage: () => (state) => {
+        if (state) state.isLoading = false;
+      },
     }
   )
 );

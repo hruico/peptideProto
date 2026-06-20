@@ -1,14 +1,20 @@
 import '../global.css';
 
 import { useFonts } from 'expo-font';
-import { Stack, router, useLocalSearchParams } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
+import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useOnboardingStore } from '../store/useOnboardingStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { useUserStore } from '../store/useUserStore';
 import { useServerSync } from '../lib/useServerSync';
+
+// Required for expo-web-browser OAuth on iOS — closes the in-app browser after redirect
+WebBrowser.maybeCompleteAuthSession();
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -38,15 +44,30 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const hasCompletedOnboarding = useOnboardingStore((s) => s.hasCompletedOnboarding);
-  const { token: authToken, userId, handleOAuthRedirect } = useAuthStore();
+  const { token, isLoading, handleOAuthRedirect, continueAsGuest } = useAuthStore();
+  const fetchProfile = useUserStore((s) => s.fetchProfile);
 
-  // Handle OAuth deep-link: exp://localhost?token=...&userId=...
-  const params = useLocalSearchParams<{ token?: string; userId?: string }>();
+  // Bootstrap: once auth store has hydrated, ensure we always have a token
   useEffect(() => {
-    if (params.token && params.userId) {
-      handleOAuthRedirect(params.token, params.userId);
+    if (isLoading) return;
+    if (!token) {
+      continueAsGuest();
+    } else {
+      fetchProfile();
     }
-  }, [params.token, params.userId]);
+  }, [isLoading]);
+
+  // Handle OAuth deep-link: peptideapp://?token=...&userId=...
+  const url = Linking.useURL();
+  useEffect(() => {
+    if (!url) return;
+    const { queryParams } = Linking.parse(url);
+    const t = queryParams?.token as string | undefined;
+    const uid = queryParams?.userId as string | undefined;
+    if (t && uid) {
+      handleOAuthRedirect(t, uid).then(() => fetchProfile());
+    }
+  }, [url]);
 
   // Sync all stores from server once token is available
   useServerSync();
