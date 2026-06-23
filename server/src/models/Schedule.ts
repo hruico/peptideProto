@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IScheduledPeptide extends Document {
   userId: mongoose.Types.ObjectId;
+  clientId: string;          // client-side UUID (the `id` field from the app)
   peptideId: string;
   label?: string;
   dose: number;
@@ -20,6 +21,7 @@ export interface IScheduledPeptide extends Document {
 const ScheduledPeptideSchema = new Schema<IScheduledPeptide>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    clientId: { type: String, required: true },   // stores the app's `id` UUID
     peptideId: { type: String, required: true },
     label: String,
     dose: { type: Number, required: true },
@@ -37,6 +39,8 @@ const ScheduledPeptideSchema = new Schema<IScheduledPeptide>(
   { timestamps: true }
 );
 
+// One scheduled peptide per user+clientId — prevents duplicates on re-sync
+ScheduledPeptideSchema.index({ userId: 1, clientId: 1 }, { unique: true });
 ScheduledPeptideSchema.index({ userId: 1 });
 
 export const ScheduledPeptide = mongoose.model<IScheduledPeptide>('ScheduledPeptide', ScheduledPeptideSchema);

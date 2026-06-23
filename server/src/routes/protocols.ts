@@ -6,6 +6,12 @@ import { ActivityLog } from '../models/Tracking';
 const router = Router();
 router.use(requireAuth);
 
+// GET /protocols/activity  — must be BEFORE /:protocolId to avoid param shadowing
+router.get('/activity', async (req: AuthRequest, res: Response) => {
+  const logs = await ActivityLog.find({ userId: req.userId }).sort({ date: -1 }).limit(50).lean();
+  res.json(logs);
+});
+
 // GET /protocols
 router.get('/', async (req: AuthRequest, res: Response) => {
   const protocols = await ActiveProtocol.find({ userId: req.userId }).sort({ startedAt: -1 }).lean();
@@ -39,12 +45,6 @@ router.post('/', async (req: AuthRequest, res: Response) => {
 router.delete('/:protocolId', async (req: AuthRequest, res: Response) => {
   await ActiveProtocol.deleteOne({ userId: req.userId, protocolId: req.params.protocolId });
   res.status(204).send();
-});
-
-// GET /protocols/activity
-router.get('/activity', async (req: AuthRequest, res: Response) => {
-  const logs = await ActivityLog.find({ userId: req.userId }).sort({ date: -1 }).limit(50).lean();
-  res.json(logs);
 });
 
 export default router;

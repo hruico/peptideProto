@@ -52,6 +52,15 @@ export const useAuthStore = create<AuthState>()(
       signOut: async () => {
         await AsyncStorage.removeItem('auth_token');
         set({ token: null, userId: null });
+        // Clear all persisted store data so the next user starts fresh
+        await AsyncStorage.multiRemove([
+          'protocol-storage',
+          'schedule-storage',
+          'vial-storage',
+          'user-storage',
+          'tracking-storage',
+          'onboarding-storage',
+        ]);
       },
 
       clearError: () => set({ error: null }),
