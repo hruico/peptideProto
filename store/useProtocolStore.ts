@@ -6,6 +6,7 @@ import {
   scheduleProtocolNotifications,
   cancelNotifications,
 } from '../lib/notifications';
+import { getProtocolById } from '../data/protocols';
 import type { Protocol, ActivityLogEntry } from '../types';
 import type { ProtocolExtended } from '../data/protocols';
 
@@ -85,11 +86,24 @@ export const useProtocolStore = create<ProtocolState>()(
 
       syncFromServer: async () => {
         try {
-          const [protocols, activity] = await Promise.all([
-            apiFetch<ActiveProtocol[]>('/protocols'),
+          const [serverProtocols, activity] = await Promise.all([
+            apiFetch<{ protocolId: string; name: string; startedAt: string }[]>('/protocols'),
             apiFetch<ActivityLogEntry[]>('/protocols/activity'),
           ]);
-          set({ myProtocols: protocols, activityLog: activity, isSynced: true });
+
+          // Enrich server records with full catalog data (peptideIds, durationDays, etc.)
+          const enriched: ActiveProtocol[] = serverProtocols
+            .map((sp) => {
+              const catalog = getProtocolById(sp.protocolId);
+              if (!catalog) return null;
+              return {
+                ...catalog,
+                startedAt: sp.startedAt,
+              } as ActiveProtocol;
+            })
+            .filter((p): p is ActiveProtocol => p !== null);
+
+          set({ myProtocols: enriched, activityLog: activity, isSynced: true });
         } catch (err) {
           console.warn('protocol syncFromServer failed:', err);
         }

@@ -61,6 +61,18 @@ export const useAuthStore = create<AuthState>()(
           'tracking-storage',
           'onboarding-storage',
         ]);
+        // Also reset in-memory Zustand state immediately (AsyncStorage clear
+        // only affects persistence on next hydration, not the live store state)
+        const { useProtocolStore } = await import('./useProtocolStore');
+        const { useScheduleStore } = await import('./useScheduleStore');
+        const { useVialStore } = await import('./useVialStore');
+        const { useUserStore } = await import('./useUserStore');
+        const { useTrackingStore } = await import('./useTrackingStore');
+        useProtocolStore.setState({ myProtocols: [], activityLog: [], isSynced: false });
+        useScheduleStore.setState({ scheduledPeptides: [], takenDoses: [], isSynced: false });
+        useVialStore.setState({ vials: [], blends: [], isSynced: false });
+        useUserStore.setState({ user: null });
+        useTrackingStore.setState({ sessions: [], isSynced: false });
       },
 
       clearError: () => set({ error: null }),
