@@ -5,6 +5,7 @@ import { Check } from 'lucide-react-native';
 import { getPeptideById } from '../../data/peptides';
 import { useScheduleStore } from '../../store/useScheduleStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 export default function TrackingIntroScreen() {
   const { peptideId } = useLocalSearchParams<{ peptideId: string }>();
@@ -13,9 +14,8 @@ export default function TrackingIntroScreen() {
   const sp = scheduledPeptides.find(s => s.peptideId === peptideId);
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
-
       <View style={styles.content}>
         {/* Summary card */}
         <View style={styles.summaryCard}>
@@ -54,7 +54,7 @@ export default function TrackingIntroScreen() {
           <Text style={styles.skipText}>Skip for now</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 

@@ -7,6 +7,7 @@ import { PEPTIDES } from '../../data/peptides';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 const FILTER_CHIPS = ['Featured', 'Body recomposition', 'Skin & hair', 'Sleep', 'Recovery & repair'];
 
@@ -50,7 +51,7 @@ export default function StackBuilderScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <View style={styles.navBar}>
@@ -172,7 +173,7 @@ export default function StackBuilderScreen() {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </ScreenBackground>
   );
 }
 

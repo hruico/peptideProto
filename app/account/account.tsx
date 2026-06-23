@@ -7,6 +7,7 @@ import { useUserStore } from '../../store/useUserStore';
 import { useAuthStore, oauthUrls } from '../../store/useAuthStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 import * as WebBrowser from 'expo-web-browser';
+import ScreenBackground from '../../components/ScreenBackground';
 
 export default function AccountScreen() {
   const { user } = useUserStore();
@@ -17,11 +18,11 @@ export default function AccountScreen() {
     : new Date().getFullYear().toString();
 
   async function handleSignIn() {
-    await WebBrowser.openBrowserAsync(oauthUrls.google);
+    await WebBrowser.openAuthSessionAsync(oauthUrls.google, 'peptideapp://');
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
@@ -85,12 +86,12 @@ export default function AccountScreen() {
           {isGuest && <Text style={styles.profileHint}>Sign in first</Text>}
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   closeBtn: {
     position: 'absolute', top: 52, right: Spacing.lg, zIndex: 10,
     width: 34, height: 34, borderRadius: 17,

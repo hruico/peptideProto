@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, Check } from 'lucide-react-native';
 import { useState } from 'react';
+import ScreenBackground from '../../components/ScreenBackground';
 import { getGoalDetailById } from '../../data/goals';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
@@ -19,7 +20,7 @@ export default function WhatsGoingOnScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
@@ -62,16 +63,15 @@ export default function WhatsGoingOnScreen() {
           <Text style={styles.continueBtnText}>Continue</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   backBtn: {
     position: 'absolute', top: 52, left: Spacing.lg, zIndex: 10,
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center',
   },
   scroll: { paddingHorizontal: Spacing.lg, paddingTop: 100, paddingBottom: 120 },
   goalTag: {
@@ -85,14 +85,14 @@ const styles = StyleSheet.create({
   options: { gap: Spacing.sm },
   optionRow: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
-    backgroundColor: Colors.surfaceElevated, borderRadius: Radii.lg,
-    padding: Spacing.md, borderWidth: 1.5, borderColor: Colors.surfaceBorder,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: Radii.lg,
+    padding: Spacing.md, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.12)',
   },
   optionRowSelected: {
     backgroundColor: Colors.primaryOrangeLight, borderColor: Colors.primaryOrange,
   },
   optionCheck: {
-    width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: Colors.surfaceBorder,
+    width: 22, height: 22, borderRadius: 11, borderWidth: 2, borderColor: 'rgba(255,255,255,0.3)',
     alignItems: 'center', justifyContent: 'center',
   },
   optionCheckSelected: { backgroundColor: Colors.primaryOrange, borderColor: Colors.primaryOrange },
@@ -101,8 +101,8 @@ const styles = StyleSheet.create({
   footerNote: { marginTop: Spacing.lg, fontSize: Typography.xs, color: Colors.textTertiary, textAlign: 'center' },
   footer: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    padding: Spacing.lg, paddingBottom: 36, backgroundColor: Colors.base,
-    borderTopWidth: 1, borderTopColor: Colors.surfaceBorder,
+    padding: Spacing.lg, paddingBottom: 36, backgroundColor: 'rgba(18,19,42,0.88)',
+    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)',
   },
   continueBtn: {
     backgroundColor: Colors.primaryOrange, borderRadius: 32, paddingVertical: 18, alignItems: 'center',

@@ -12,7 +12,8 @@ import { useTrackingStore } from '../store/useTrackingStore';
 
 export function useServerSync() {
   const token = useAuthStore((s) => s.token);
-  const hasSynced = useRef(false);
+  // Track which token we last synced for — re-sync when identity changes
+  const lastSyncedToken = useRef<string | null>(null);
 
   const fetchProfile = useUserStore((s) => s.fetchProfile);
   const syncProtocols = useProtocolStore((s) => s.syncFromServer);
@@ -21,8 +22,8 @@ export function useServerSync() {
   const syncTracking = useTrackingStore((s) => s.syncFromServer);
 
   useEffect(() => {
-    if (!token || hasSynced.current) return;
-    hasSynced.current = true;
+    if (!token || token === lastSyncedToken.current) return;
+    lastSyncedToken.current = token;
 
     // Fan out — all syncs are independent
     Promise.allSettled([

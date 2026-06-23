@@ -49,6 +49,9 @@ export const useOnboardingStore = create<OnboardingState>()(
         set({ hasCompletedOnboarding: true });
         const { sex, ageRange, selectedPath, goal, interestedPeptideId, interestReasons } = get();
         try {
+          // Only sync if a token exists — skip silently for guest/unauthenticated users
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
           await apiFetch('/user/me/onboarding', {
             method: 'PATCH',
             body: {

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { addWeeks, format } from 'date-fns';
 import { useTrackingStore } from '../../store/useTrackingStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 function genId() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
 
@@ -47,9 +48,8 @@ export default function BaselineScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
-
       <View style={styles.navBar}>
         <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn}>
           <X size={20} color={Colors.textPrimary} />
@@ -89,7 +89,7 @@ export default function BaselineScreen() {
           <Text style={styles.saveBtnText}>Save Baseline & Continue</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 

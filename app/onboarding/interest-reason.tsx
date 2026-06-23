@@ -4,6 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, Check } from 'lucide-react-native';
 import GradientButton from '../../components/ui/GradientButton';
+import ScreenBackground from '../../components/ScreenBackground';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
 import { useAuthStore } from '../../store/useAuthStore';
 import { getPeptideById } from '../../data/peptides';
@@ -43,7 +44,7 @@ export default function InterestReasonScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.back} onPress={() => router.back()}>
@@ -89,12 +90,11 @@ export default function InterestReasonScreen() {
           disabled={selected.length === 0}
         />
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   back: { paddingTop: 56, paddingHorizontal: Spacing.md },
   scroll: { paddingHorizontal: Spacing.lg, paddingBottom: 16 },
   heading: {
@@ -114,12 +114,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: 'rgba(255,255,255,0.07)',
     borderRadius: Radii.lg,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
     borderWidth: 1.5,
-    borderColor: Colors.surfaceBorder,
+    borderColor: 'rgba(255,255,255,0.12)',
   },
   rowSelected: {
     borderColor: Colors.accentOrange,

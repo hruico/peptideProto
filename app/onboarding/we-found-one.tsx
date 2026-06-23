@@ -3,6 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, Check, Bell, Calculator } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import ScreenBackground from '../../components/ScreenBackground';
 import { getGoalDetailById } from '../../data/goals';
 import { getProtocolById } from '../../data/protocols';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
@@ -27,7 +28,7 @@ export default function WeFoundOneScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground bottomOpacity={0.95}>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
@@ -73,16 +74,15 @@ export default function WeFoundOneScreen() {
           <Text style={styles.ctaBtnText}>Let's go →</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   backBtn: {
     position: 'absolute', top: 52, left: Spacing.lg, zIndex: 10,
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center',
   },
   scroll: { paddingHorizontal: Spacing.lg, paddingTop: 100, paddingBottom: 120 },
   heroCard: {
@@ -111,8 +111,8 @@ const styles = StyleSheet.create({
   featureText: { flex: 1, fontSize: Typography.base, color: Colors.textPrimary, fontWeight: FontWeight.medium },
   footer: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    padding: Spacing.lg, paddingBottom: 36, backgroundColor: Colors.base,
-    borderTopWidth: 1, borderTopColor: Colors.surfaceBorder,
+    padding: Spacing.lg, paddingBottom: 36, backgroundColor: 'rgba(18,19,42,0.88)',
+    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)',
   },
   ctaBtn: {
     backgroundColor: Colors.primaryOrange, borderRadius: 32, paddingVertical: 18, alignItems: 'center',

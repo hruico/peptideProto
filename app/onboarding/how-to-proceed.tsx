@@ -2,13 +2,14 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
+import ScreenBackground from '../../components/ScreenBackground';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
 export default function HowToProceedScreen() {
   const { goalId } = useLocalSearchParams<{ goalId: string }>();
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground bottomOpacity={0.90}>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
@@ -48,7 +49,7 @@ export default function HowToProceedScreen() {
 
         <Text style={styles.footerNote}>Not sure? The recommended protocol is a great starting point.</Text>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
@@ -62,11 +63,11 @@ function getGoalEmoji(id?: string) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   backBtn: {
     position: 'absolute', top: 52, left: Spacing.lg, zIndex: 10,
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
   },
   content: {
     flex: 1, paddingHorizontal: Spacing.lg, paddingTop: 110, alignItems: 'center',
@@ -83,8 +84,8 @@ const styles = StyleSheet.create({
   cards: { width: '100%', gap: Spacing.md, marginBottom: Spacing.xl },
   optionCard: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: Colors.surface, borderRadius: Radii.xl,
-    padding: Spacing.lg, borderWidth: 1, borderColor: Colors.surfaceBorder,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: Radii.xl,
+    padding: Spacing.lg, borderWidth: 1, borderColor: 'rgba(255,255,255,0.14)',
   },
   optionLeft: { flex: 1 },
   optionTitle: { fontSize: Typography.base, fontWeight: FontWeight.bold, color: Colors.textPrimary, marginBottom: 4 },

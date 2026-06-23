@@ -47,15 +47,25 @@ function RootLayoutNav() {
   const { token, isLoading, handleOAuthRedirect, continueAsGuest } = useAuthStore();
   const fetchProfile = useUserStore((s) => s.fetchProfile);
 
-  // Bootstrap: once auth store has hydrated, ensure we always have a token
+  // Bootstrap: once auth store has hydrated, ensure we always have a token.
+  // We defer guest creation briefly so the OAuth deep-link has a chance to
+  // deliver its token first — otherwise the deep-link races and loses.
   useEffect(() => {
     if (isLoading) return;
     if (!token) {
-      continueAsGuest();
+      // Small delay lets the Linking.useURL effect fire first on OAuth redirect
+      const timer = setTimeout(() => {
+        // Re-read token from store at callback time, not closure time
+        const currentToken = useAuthStore.getState().token;
+        if (!currentToken) {
+          continueAsGuest();
+        }
+      }, 300);
+      return () => clearTimeout(timer);
     } else {
       fetchProfile();
     }
-  }, [isLoading]);
+  }, [isLoading, token]);
 
   // Handle OAuth deep-link: peptideapp://?token=...&userId=...
   const url = Linking.useURL();
@@ -90,6 +100,8 @@ function RootLayoutNav() {
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="peptide/[id]" options={{ presentation: 'modal' }} />
         <Stack.Screen name="protocol/[id]" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="protocol/started" options={{ presentation: 'modal' }} />
+        <Stack.Screen name="protocol/active-detail" options={{ presentation: 'modal' }} />
         <Stack.Screen name="account/account" options={{ presentation: 'modal' }} />
         <Stack.Screen name="account/my-protocols" options={{ presentation: 'modal' }} />
         <Stack.Screen name="account/stats" options={{ presentation: 'modal' }} />

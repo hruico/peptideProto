@@ -6,6 +6,10 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiFetch } from '../lib/apiClient';
+import {
+  schedulePeptideNotifications,
+  cancelNotifications,
+} from '../lib/notifications';
 
 export interface ScheduledPeptide {
   id: string;
@@ -22,6 +26,8 @@ export interface ScheduledPeptide {
   startDate: string;
   endDate?: string;
   titrationMode?: 'titrate' | 'fixed';
+  /** Expo notification IDs for cancellation on removal */
+  notificationIds?: string[];
 }
 
 interface ScheduleState {
@@ -39,7 +45,7 @@ interface ScheduleState {
 
 export const useScheduleStore = create<ScheduleState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       scheduledPeptides: [],
       takenDoses: [],
       isSynced: false,
@@ -49,7 +55,21 @@ export const useScheduleStore = create<ScheduleState>()(
           const filtered = state.scheduledPeptides.filter((s) => s.id !== p.id);
           return { scheduledPeptides: [p, ...filtered] };
         });
+
+        // Schedule dose reminder notifications
+        const notificationIds = await schedulePeptideNotifications(p);
+        if (notificationIds.length > 0) {
+          set((state) => ({
+            scheduledPeptides: state.scheduledPeptides.map((s) =>
+              s.id === p.id ? { ...s, notificationIds } : s
+            ),
+          }));
+        }
+
         try {
+          // Only sync if a token exists
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
           await apiFetch('/schedule', { method: 'POST', body: p });
         } catch (err) {
           console.warn('addScheduledPeptide sync failed:', err);
@@ -57,10 +77,17 @@ export const useScheduleStore = create<ScheduleState>()(
       },
 
       removeScheduledPeptide: async (id) => {
+        // Cancel notifications
+        const sp = get().scheduledPeptides.find((s) => s.id === id);
+        if (sp?.notificationIds?.length) {
+          await cancelNotifications(sp.notificationIds);
+        }
         set((state) => ({
           scheduledPeptides: state.scheduledPeptides.filter((s) => s.id !== id),
         }));
         try {
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
           await apiFetch(`/schedule/${id}`, { method: 'DELETE' });
         } catch (err) {
           console.warn('removeScheduledPeptide sync failed:', err);
@@ -74,6 +101,8 @@ export const useScheduleStore = create<ScheduleState>()(
             : [...state.takenDoses, doseKey],
         }));
         try {
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
           await apiFetch('/schedule/doses', { method: 'POST', body: { doseKey } });
         } catch (err) {
           console.warn('markDoseTaken sync failed:', err);
@@ -85,6 +114,8 @@ export const useScheduleStore = create<ScheduleState>()(
           takenDoses: state.takenDoses.filter((k) => k !== doseKey),
         }));
         try {
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
           await apiFetch(`/schedule/doses/${encodeURIComponent(doseKey)}`, { method: 'DELETE' });
         } catch (err) {
           console.warn('unmarkDoseTaken sync failed:', err);
@@ -95,6 +126,8 @@ export const useScheduleStore = create<ScheduleState>()(
 
       syncFromServer: async () => {
         try {
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
           const data = await apiFetch<{
             scheduledPeptides: ScheduledPeptide[];
             takenDoses: string[];

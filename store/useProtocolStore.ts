@@ -2,10 +2,17 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { apiFetch } from '../lib/apiClient';
+import {
+  scheduleProtocolNotifications,
+  cancelNotifications,
+} from '../lib/notifications';
 import type { Protocol, ActivityLogEntry } from '../types';
+import type { ProtocolExtended } from '../data/protocols';
 
 interface ActiveProtocol extends Protocol {
   startedAt: string;
+  /** Expo notification IDs so we can cancel them on removal */
+  notificationIds?: string[];
 }
 
 interface ProtocolState {
@@ -14,7 +21,7 @@ interface ProtocolState {
   isSynced: boolean;
 
   // Actions
-  startProtocol: (protocol: Protocol) => Promise<void>;
+  startProtocol: (protocol: ProtocolExtended) => Promise<void>;
   removeProtocol: (id: string) => Promise<void>;
   logActivity: (entry: ActivityLogEntry) => void;
   clearActivityLog: () => void;
@@ -29,12 +36,22 @@ export const useProtocolStore = create<ProtocolState>()(
       isSynced: false,
 
       startProtocol: async (protocol) => {
-        // Optimistic local update
+        // Optimistic local update (without notification IDs yet)
         set((state) => {
           const filtered = state.myProtocols.filter((p) => p.id !== protocol.id);
           const active: ActiveProtocol = { ...protocol, startedAt: new Date().toISOString() };
           return { myProtocols: [active, ...filtered] };
         });
+
+        // Schedule notifications and store their IDs
+        const notificationIds = await scheduleProtocolNotifications(protocol);
+        if (notificationIds.length > 0) {
+          set((state) => ({
+            myProtocols: state.myProtocols.map((p) =>
+              p.id === protocol.id ? { ...p, notificationIds } : p
+            ),
+          }));
+        }
 
         try {
           await apiFetch('/protocols', {
@@ -47,6 +64,12 @@ export const useProtocolStore = create<ProtocolState>()(
       },
 
       removeProtocol: async (id) => {
+        // Cancel any scheduled notifications for this protocol
+        const protocol = get().myProtocols.find((p) => p.id === id);
+        if (protocol?.notificationIds?.length) {
+          await cancelNotifications(protocol.notificationIds);
+        }
+
         set((state) => ({ myProtocols: state.myProtocols.filter((p) => p.id !== id) }));
         try {
           await apiFetch(`/protocols/${id}`, { method: 'DELETE' });

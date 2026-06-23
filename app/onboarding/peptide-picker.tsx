@@ -7,6 +7,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, Search, X } from 'lucide-react-native';
 import GradientButton from '../../components/ui/GradientButton';
+import ScreenBackground from '../../components/ScreenBackground';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
 import { PEPTIDES, PEPTIDE_CATEGORIES } from '../../data/peptides';
 import { getGoalById } from '../../data/goals';
@@ -55,7 +56,7 @@ export default function PeptidePickerScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.back} onPress={() => router.back()}>
@@ -124,12 +125,11 @@ export default function PeptidePickerScreen() {
           <Text style={styles.empty}>No peptides found for "{query}"</Text>
         }
       />
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   back: { paddingTop: 56, paddingHorizontal: Spacing.md },
   header: {
     flexDirection: 'row',
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: 'rgba(255,255,255,0.07)',
     borderRadius: Radii.lg,
     marginHorizontal: Spacing.lg,
     paddingHorizontal: Spacing.md,
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
     marginBottom: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
+    borderColor: 'rgba(255,255,255,0.14)',
   },
   searchInput: {
     flex: 1,
@@ -181,12 +181,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: 'rgba(255,255,255,0.07)',
     borderRadius: Radii.lg,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
     borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
+    borderColor: 'rgba(255,255,255,0.12)',
   },
   rowSelected: {
     borderColor: Colors.accentOrange,

@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import ScreenBackground from '../../components/ScreenBackground';
 import { useVialStore } from '../../store/useVialStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 import type { Vial } from '../../types';
@@ -9,7 +10,7 @@ export default function ReconstituteScreen() {
   const { vials } = useVialStore();
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
@@ -61,7 +62,7 @@ export default function ReconstituteScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
@@ -97,7 +98,7 @@ const vialStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   scroll: { paddingBottom: 100 },
   heroSection: {
     alignItems: 'center',

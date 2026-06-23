@@ -10,6 +10,7 @@ import { useScheduleStore } from '../../store/useScheduleStore';
 import { useProtocolStore } from '../../store/useProtocolStore';
 import { useTrackingStore } from '../../store/useTrackingStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
@@ -52,7 +53,7 @@ export default function SettingsScreen() {
 
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <View style={styles.header}>
@@ -173,12 +174,12 @@ export default function SettingsScreen() {
           )}
         </View>
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg, paddingTop: 52, paddingBottom: Spacing.md,

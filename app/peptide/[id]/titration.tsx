@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, TrendingUp } from 'lucide-react-native';
+import ScreenBackground from '../../../components/ScreenBackground';
 import { getPeptideById } from '../../../data/peptides';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../../constants/theme';
 
@@ -14,7 +15,7 @@ export default function TitrationScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
@@ -50,21 +51,20 @@ export default function TitrationScreen() {
           Slow titration is key — increase dose every 4 weeks to minimize GI effects
         </Text>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   backBtn: {
     position: 'absolute', top: 52, left: Spacing.lg, zIndex: 10,
     width: 36, height: 36, borderRadius: 18,
-    backgroundColor: Colors.surface, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center',
   },
   content: { flex: 1, paddingHorizontal: Spacing.lg, paddingTop: 110, alignItems: 'center' },
   iconWrap: {
     width: 72, height: 72, borderRadius: 36,
-    backgroundColor: '#EFF6FF', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: 'rgba(59,130,246,0.15)', alignItems: 'center', justifyContent: 'center',
     marginBottom: Spacing.xl,
   },
   headline: {
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   cards: { width: '100%', gap: Spacing.md, marginBottom: Spacing.lg },
   optionCard: {
     borderRadius: Radii.xl, padding: Spacing.lg,
-    backgroundColor: Colors.surface, borderWidth: 1.5, borderColor: Colors.surfaceBorder,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.12)',
   },
   optionCardPrimary: { borderColor: Colors.primaryOrange, backgroundColor: Colors.primaryOrangeLight },
   recommendedBadge: {

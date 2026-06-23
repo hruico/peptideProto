@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Check, FlaskConical } from 'lucide-react-native';
 import { getPeptideById } from '../../data/peptides';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 export default function PeptideAddedScreen() {
   const { peptideId } = useLocalSearchParams<{ peptideId: string }>();
@@ -11,9 +12,8 @@ export default function PeptideAddedScreen() {
   const name = peptide?.name ?? 'Peptide';
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
-
       <View style={styles.content}>
         {/* Big green checkmark */}
         <View style={styles.checkCircle}>
@@ -58,12 +58,12 @@ export default function PeptideAddedScreen() {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   content: { flex: 1, paddingHorizontal: Spacing.lg, paddingTop: 100, alignItems: 'center' },
   checkCircle: {
     width: 96, height: 96, borderRadius: 48,

@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Compass, Syringe, Pill, Home } from 'lucide-react-native';
+import { Compass, Syringe, Home } from 'lucide-react-native';
 import { Colors } from '../../constants/theme';
 
 export default function TabLayout() {
@@ -8,7 +8,7 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: 'rgba(26,27,58,0.96)',
+          backgroundColor: 'rgba(18,19,42,0.82)',
           borderTopWidth: 0,
           position: 'absolute',
           bottom: 16,
@@ -20,9 +20,12 @@ export default function TabLayout() {
           paddingTop: 8,
           shadowColor: '#000',
           shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.4,
-          shadowRadius: 16,
+          shadowOpacity: 0.5,
+          shadowRadius: 20,
           elevation: 12,
+          // Subtle white border so it reads as glass
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.10)',
         },
         tabBarActiveTintColor: Colors.primaryOrange,
         tabBarInactiveTintColor: 'rgba(255,255,255,0.35)',
@@ -53,6 +56,11 @@ export default function TabLayout() {
           title: 'Reconstitute',
           tabBarIcon: ({ color }) => <Syringe color={color} size={22} />,
         }}
+      />
+      {/* Hide the redirect index tab from the tab bar */}
+      <Tabs.Screen
+        name="index"
+        options={{ href: null }}
       />
     </Tabs>
   );

@@ -6,6 +6,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, Shield } from 'lucide-react-native';
 import { useState } from 'react';
+import ScreenBackground from '../../components/ScreenBackground';
 import { getPeptideById } from '../../data/peptides';
 import { PROTOCOLS, getProtocolById } from '../../data/protocols';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
@@ -28,12 +29,12 @@ export default function PeptideDetailScreen() {
   const [activeTab, setActiveTab] = useState('Learn');
 
   if (!peptide) return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
         <ChevronLeft size={22} color={Colors.textPrimary} />
       </TouchableOpacity>
       <Text style={styles.notFound}>Peptide not found</Text>
-    </View>
+    </ScreenBackground>
   );
 
   const p = peptide as any;
@@ -49,7 +50,7 @@ export default function PeptideDetailScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground bottomOpacity={0.97}>
       <StatusBar style="light" />
 
       {/* Header */}
@@ -100,7 +101,7 @@ export default function PeptideDetailScreen() {
           <Text style={styles.startBtnText}>Start {peptide.name}</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
@@ -299,12 +300,12 @@ const learnStyles = StyleSheet.create({
     width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.primaryOrange, marginTop: 7,
   },
   bulletText: { flex: 1, fontSize: Typography.sm, color: Colors.textPrimary, lineHeight: 20 },
-  weekRow: { paddingVertical: Spacing.sm, borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder },
+  weekRow: { paddingVertical: Spacing.sm, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)' },
   weekLabel: { fontSize: Typography.xs, fontWeight: FontWeight.bold, color: Colors.primaryOrange, marginBottom: 2 },
   weekOutcome: { fontSize: Typography.sm, color: Colors.textPrimary },
   safetyCard: {
-    backgroundColor: Colors.surface, borderRadius: Radii.lg, padding: Spacing.md,
-    borderWidth: 1, borderColor: Colors.surfaceBorder,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: Radii.lg, padding: Spacing.md,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
   },
   safetyHeader: { flexDirection: 'row', gap: Spacing.md, alignItems: 'center', marginBottom: Spacing.sm },
   gradeCircle: {
@@ -333,15 +334,15 @@ const schedStyles = StyleSheet.create({
     fontSize: Typography.xs, color: Colors.textTertiary, fontWeight: FontWeight.semibold,
     letterSpacing: 1.5, marginBottom: Spacing.sm, marginTop: Spacing.lg,
   },
-  table: { borderRadius: Radii.lg, overflow: 'hidden', borderWidth: 1, borderColor: Colors.surfaceBorder },
-  tableHeader: { flexDirection: 'row', backgroundColor: Colors.surface, paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md },
+  table: { borderRadius: Radii.lg, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  tableHeader: { flexDirection: 'row', backgroundColor: 'rgba(255,255,255,0.08)', paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md },
   tableRow: { flexDirection: 'row', paddingVertical: Spacing.sm, paddingHorizontal: Spacing.md },
-  tableRowAlt: { backgroundColor: Colors.backgroundSecondary },
+  tableRowAlt: { backgroundColor: 'rgba(255,255,255,0.04)' },
   tableCell: { fontSize: Typography.xs, color: Colors.textPrimary },
   tableCellHeader: { fontWeight: FontWeight.bold, color: Colors.textSecondary },
   doseCard: {
-    backgroundColor: Colors.surface, borderRadius: Radii.lg, padding: Spacing.md,
-    borderWidth: 1, borderColor: Colors.surfaceBorder,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: Radii.lg, padding: Spacing.md,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
   },
   doseRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', gap: Spacing.md },
   doseLabel: { fontSize: Typography.sm, color: Colors.textSecondary, flex: 1 },
@@ -350,8 +351,8 @@ const schedStyles = StyleSheet.create({
   tipBox: { backgroundColor: Colors.primaryOrangeLight, borderRadius: Radii.md, padding: Spacing.sm },
   tipText: { fontSize: Typography.xs, color: Colors.primaryOrange, lineHeight: 18 },
   protoCard: {
-    backgroundColor: Colors.surface, borderRadius: Radii.lg, padding: Spacing.md,
-    marginRight: Spacing.sm, minWidth: 140, borderWidth: 1, borderColor: Colors.surfaceBorder,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: Radii.lg, padding: Spacing.md,
+    marginRight: Spacing.sm, minWidth: 140, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
   },
   protoName: { fontSize: Typography.sm, fontWeight: FontWeight.bold, color: Colors.textPrimary },
   protoDuration: { fontSize: Typography.xs, color: Colors.textSecondary, marginTop: 4 },
@@ -365,15 +366,16 @@ const sourceStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   notFound: { textAlign: 'center', marginTop: 100, color: Colors.textSecondary },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg, paddingTop: 52, paddingBottom: Spacing.md,
   },
   backBtn: {
-    width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.surface,
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)',
   },
   categoryBadge: {
     backgroundColor: Colors.primaryOrangeLight, borderRadius: Radii.full,
@@ -391,7 +393,7 @@ const styles = StyleSheet.create({
   peptideSubtitle: { fontSize: Typography.xs, color: Colors.textTertiary, fontWeight: FontWeight.semibold, letterSpacing: 0.8, marginTop: 2 },
   alsoKnown: { fontSize: Typography.xs, color: Colors.textSecondary, marginTop: 4 },
   tabBar: {
-    flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
+    flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)',
     paddingHorizontal: Spacing.lg,
   },
   tabItem: { paddingVertical: Spacing.md, marginRight: Spacing.xl, position: 'relative' },
@@ -404,8 +406,9 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.lg },
   stickyFooter: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    padding: Spacing.lg, paddingBottom: 36, backgroundColor: Colors.base,
-    borderTopWidth: 1, borderTopColor: Colors.surfaceBorder,
+    padding: Spacing.lg, paddingBottom: 36,
+    backgroundColor: 'rgba(18,19,42,0.88)',
+    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)',
   },
   startBtn: {
     backgroundColor: Colors.primaryOrange, borderRadius: 32, paddingVertical: 18, alignItems: 'center',
