@@ -5,6 +5,7 @@ import { ChevronLeft, Users } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PROTOCOLS } from '../../data/protocols';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 const STACK_COLORS: Record<string, readonly [string, string]> = {
   'injury-recovery-stack': ['#EF4444', '#B91C1C'],
@@ -18,7 +19,7 @@ const STACK_COLORS: Record<string, readonly [string, string]> = {
 
 export default function PopularStacksScreen() {
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <View style={styles.header}>
@@ -64,12 +65,12 @@ export default function PopularStacksScreen() {
         })}
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
     paddingHorizontal: Spacing.lg, paddingTop: 52, paddingBottom: Spacing.lg,

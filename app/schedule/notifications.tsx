@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Bell, ClipboardList } from 'lucide-react-native';
 import { useState } from 'react';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 export default function NotificationsScreen() {
   const [doseReminders, setDoseReminders] = useState(true);
@@ -15,9 +16,8 @@ export default function NotificationsScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
-
       <View style={styles.content}>
         <View style={styles.bellWrap}>
           <Bell size={40} color={Colors.primaryOrange} />
@@ -70,7 +70,7 @@ export default function NotificationsScreen() {
           <Text style={styles.skipText}>Not now</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 

@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Users, Clock } from 'lucide-react-native';
 import type { Protocol } from '../../types';
@@ -13,26 +13,28 @@ interface Props {
 
 const SCREEN_W = Dimensions.get('window').width;
 
-// Per-protocol gradient colors
-const PROTOCOL_GRADIENTS: Record<string, readonly [string, string]> = {
-  'injury-recovery-stack': ['#B91C1C', '#7F1D1D'],
-  'gh-optimizer': ['#1D4ED8', '#1E3A8A'],
-  'cognitive-edge': ['#6D28D9', '#4C1D95'],
-  'longevity-protocol': ['#0F766E', '#134E4A'],
-  'body-recomp': ['#C2410C', '#7C2D12'],
-  'elite-recovery': ['#15803D', '#14532D'],
-  'gut-reset': ['#4338CA', '#312E81'],
-};
+// Cycle through the 4 random images
+const CARD_IMAGES = [
+  require('../../assets/images/random1.jpeg'),
+  require('../../assets/images/random2.jpg'),
+  require('../../assets/images/random3.jpg'),
+  require('../../assets/images/random4.jpg'),
+];
 
-const CATEGORY_GRADIENTS: Record<string, readonly [string, string]> = {
-  'curated-combo': ['#1D4ED8', '#1E3A8A'],
-  'expert-protocol': ['#6D28D9', '#4C1D95'],
-  'community': ['#0F766E', '#134E4A'],
+// Deterministic index per protocol so each always gets the same image
+const PROTOCOL_IMAGE_INDEX: Record<string, number> = {
+  'injury-recovery-stack': 0,
+  'gh-optimizer': 1,
+  'cognitive-edge': 2,
+  'longevity-protocol': 3,
+  'body-recomp': 0,
+  'elite-recovery': 1,
+  'gut-reset': 2,
 };
 
 export default function ProtocolHeroCard({ protocol, onPress, width, fullWidth }: Props) {
   const cardWidth = fullWidth ? SCREEN_W - 48 : (width ?? 260);
-  const gradient = PROTOCOL_GRADIENTS[protocol.id] ?? CATEGORY_GRADIENTS[protocol.category] ?? ['#1A1A2E', '#0D1225'];
+  const imgIndex = PROTOCOL_IMAGE_INDEX[protocol.id] ?? 0;
 
   const participantDisplay = protocol.participantCount >= 1000
     ? `${(protocol.participantCount / 1000).toFixed(1)}k`
@@ -44,12 +46,19 @@ export default function ProtocolHeroCard({ protocol, onPress, width, fullWidth }
       activeOpacity={0.88}
       style={[styles.wrapper, { width: cardWidth }, fullWidth && styles.fullWidthWrapper]}
     >
-      <LinearGradient
-        colors={gradient}
+      <ImageBackground
+        source={CARD_IMAGES[imgIndex]}
         style={styles.card}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        imageStyle={styles.cardImage}
+        resizeMode="cover"
       >
+        {/* Dark gradient — lighter at top, heavier at bottom for text legibility */}
+        <LinearGradient
+          colors={['rgba(10,10,25,0.25)', 'rgba(10,10,25,0.75)']}
+          locations={[0, 1]}
+          style={StyleSheet.absoluteFill}
+        />
+
         {/* Category label top-left */}
         <View style={styles.categoryBadge}>
           <Text style={styles.categoryBadgeText}>
@@ -76,7 +85,7 @@ export default function ProtocolHeroCard({ protocol, onPress, width, fullWidth }
             </View>
           </View>
         </View>
-      </LinearGradient>
+      </ImageBackground>
     </TouchableOpacity>
   );
 }
@@ -96,6 +105,9 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     justifyContent: 'space-between',
   },
+  cardImage: {
+    borderRadius: Radii.xl,
+  },
   categoryBadge: {
     alignSelf: 'flex-start',
     backgroundColor: 'rgba(255,255,255,0.15)',
@@ -103,10 +115,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm,
     paddingVertical: 4,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.25)',
   },
   categoryBadgeText: {
-    color: 'rgba(255,255,255,0.9)',
+    color: 'rgba(255,255,255,0.95)',
     fontSize: 9,
     fontWeight: FontWeight.bold,
     letterSpacing: 1,
@@ -119,9 +131,12 @@ const styles = StyleSheet.create({
     fontSize: Typography.lg,
     fontWeight: FontWeight.extrabold,
     lineHeight: 26,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   subtitle: {
-    color: 'rgba(255,255,255,0.65)',
+    color: 'rgba(255,255,255,0.75)',
     fontSize: Typography.xs,
   },
   metaRow: {
@@ -133,13 +148,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(0,0,0,0.25)',
+    backgroundColor: 'rgba(0,0,0,0.35)',
     borderRadius: Radii.full,
     paddingHorizontal: Spacing.sm,
     paddingVertical: 3,
   },
   metaText: {
-    color: 'rgba(255,255,255,0.85)',
+    color: 'rgba(255,255,255,0.9)',
     fontSize: 10,
     fontWeight: FontWeight.medium,
   },

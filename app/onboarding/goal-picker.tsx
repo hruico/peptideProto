@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import ScreenBackground from '../../components/ScreenBackground';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
@@ -31,7 +32,7 @@ export default function GoalPickerScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
@@ -70,12 +71,11 @@ export default function GoalPickerScreen() {
           })}
         </View>
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   backBtn: {
     position: 'absolute',
     top: 52,

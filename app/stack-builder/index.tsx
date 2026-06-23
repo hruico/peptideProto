@@ -5,8 +5,9 @@ import { X, Plus } from 'lucide-react-native';
 import { useState } from 'react';
 import { PEPTIDES } from '../../data/peptides';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
-import { useUserStore } from '../../store/useUserStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 const FILTER_CHIPS = ['Featured', 'Body recomposition', 'Skin & hair', 'Sleep', 'Recovery & repair'];
 
@@ -32,7 +33,7 @@ export default function StackBuilderScreen() {
   const [stackIds, setStackIds] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'peptides' | 'blends' | 'custom'>('peptides');
   const { completeOnboarding } = useOnboardingStore();
-  const { continueAsGuest } = useUserStore();
+  const { continueAsGuest } = useAuthStore();
 
   const filteredPeptides = PEPTIDES.filter(p => {
     const cat = CATEGORY_MAP[activeFilter];
@@ -50,7 +51,7 @@ export default function StackBuilderScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <View style={styles.navBar}>
@@ -172,7 +173,7 @@ export default function StackBuilderScreen() {
           </TouchableOpacity>
         </View>
       )}
-    </View>
+    </ScreenBackground>
   );
 }
 

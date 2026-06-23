@@ -1,15 +1,15 @@
 // ─── useScheduleStore.ts ──────────────────────────────────────────────────────
-// Manages the user's active peptide schedules and dose-taken history.
-//
-// Key design decisions:
-//   - Each ScheduledPeptide has an id, so multiple peptides can coexist
-//   - takenDoses uses string keys: `${peptideId}-${date}-${time}` to uniquely
-//     identify each dose instance without a separate log table
-//   - Persisted via AsyncStorage so schedules survive app restarts
+// Local Zustand cache + backend sync via REST API.
+// takenDoses are stored as string keys: `${peptideId}-${date}-${time}`
 // ─────────────────────────────────────────────────────────────────────────────
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiFetch } from '../lib/apiClient';
+import {
+  schedulePeptideNotifications,
+  cancelNotifications,
+} from '../lib/notifications';
 
 export interface ScheduledPeptide {
   id: string;
@@ -18,57 +18,125 @@ export interface ScheduledPeptide {
   dose: number;
   unit: 'mg' | 'mcg';
   frequency: 'once' | 'twice' | 'custom';
-  times: string[];             // ["09:00", "21:00"]
-  days: number[];              // [0,1,2,3,4,5,6] (0=Sun)
+  times: string[];
+  days: number[];
   durationValue?: number;
   durationUnit?: 'days' | 'weeks' | 'months';
   runIndefinitely: boolean;
-  startDate: string;           // ISO
-  endDate?: string;            // computed ISO
+  startDate: string;
+  endDate?: string;
   titrationMode?: 'titrate' | 'fixed';
+  /** Expo notification IDs for cancellation on removal */
+  notificationIds?: string[];
 }
 
 interface ScheduleState {
   scheduledPeptides: ScheduledPeptide[];
-  takenDoses: string[];        // doseKeys: `${peptideId}-${date}-${time}`
+  takenDoses: string[];
+  isSynced: boolean;
 
-  addScheduledPeptide: (p: ScheduledPeptide) => void;
-  removeScheduledPeptide: (id: string) => void;
-  markDoseTaken: (doseKey: string) => void;
-  unmarkDoseTaken: (doseKey: string) => void;
+  addScheduledPeptide: (p: ScheduledPeptide) => Promise<void>;
+  removeScheduledPeptide: (id: string) => Promise<void>;
+  markDoseTaken: (doseKey: string) => Promise<void>;
+  unmarkDoseTaken: (doseKey: string) => Promise<void>;
   clearAll: () => void;
+  syncFromServer: () => Promise<void>;
 }
 
 export const useScheduleStore = create<ScheduleState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       scheduledPeptides: [],
       takenDoses: [],
+      isSynced: false,
 
-      addScheduledPeptide: (p) =>
+      addScheduledPeptide: async (p) => {
         set((state) => {
           const filtered = state.scheduledPeptides.filter((s) => s.id !== p.id);
           return { scheduledPeptides: [p, ...filtered] };
-        }),
+        });
 
-      removeScheduledPeptide: (id) =>
+        // Schedule dose reminder notifications
+        const notificationIds = await schedulePeptideNotifications(p);
+        if (notificationIds.length > 0) {
+          set((state) => ({
+            scheduledPeptides: state.scheduledPeptides.map((s) =>
+              s.id === p.id ? { ...s, notificationIds } : s
+            ),
+          }));
+        }
+
+        try {
+          // Only sync if a token exists
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
+          await apiFetch('/schedule', { method: 'POST', body: p });
+        } catch (err) {
+          console.warn('addScheduledPeptide sync failed:', err);
+        }
+      },
+
+      removeScheduledPeptide: async (id) => {
+        // Cancel notifications
+        const sp = get().scheduledPeptides.find((s) => s.id === id);
+        if (sp?.notificationIds?.length) {
+          await cancelNotifications(sp.notificationIds);
+        }
         set((state) => ({
           scheduledPeptides: state.scheduledPeptides.filter((s) => s.id !== id),
-        })),
+        }));
+        try {
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
+          await apiFetch(`/schedule/${id}`, { method: 'DELETE' });
+        } catch (err) {
+          console.warn('removeScheduledPeptide sync failed:', err);
+        }
+      },
 
-      markDoseTaken: (doseKey) =>
+      markDoseTaken: async (doseKey) => {
         set((state) => ({
           takenDoses: state.takenDoses.includes(doseKey)
             ? state.takenDoses
             : [...state.takenDoses, doseKey],
-        })),
+        }));
+        try {
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
+          await apiFetch('/schedule/doses', { method: 'POST', body: { doseKey } });
+        } catch (err) {
+          console.warn('markDoseTaken sync failed:', err);
+        }
+      },
 
-      unmarkDoseTaken: (doseKey) =>
+      unmarkDoseTaken: async (doseKey) => {
         set((state) => ({
           takenDoses: state.takenDoses.filter((k) => k !== doseKey),
-        })),
+        }));
+        try {
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
+          await apiFetch(`/schedule/doses/${encodeURIComponent(doseKey)}`, { method: 'DELETE' });
+        } catch (err) {
+          console.warn('unmarkDoseTaken sync failed:', err);
+        }
+      },
 
       clearAll: () => set({ scheduledPeptides: [], takenDoses: [] }),
+
+      syncFromServer: async () => {
+        try {
+          const token = await AsyncStorage.getItem('auth_token');
+          if (!token) return;
+          const data = await apiFetch<{
+            scheduledPeptides: ScheduledPeptide[];
+            takenDoses: string[];
+          }>('/schedule');
+          set({ ...data, isSynced: true });
+        } catch (err) {
+          console.warn('schedule syncFromServer failed:', err);
+        }
+      },
     }),
     {
       name: 'schedule-storage',

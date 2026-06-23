@@ -6,6 +6,7 @@ import {
 import { router } from 'expo-router';
 import { Search, X, SlidersHorizontal, Check } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
+import ScreenBackground from '../../components/ScreenBackground';
 
 import SegmentedControl from '../../components/ui/SegmentedControl';
 import ProtocolHeroCard from '../../components/cards/ProtocolHeroCard';
@@ -54,7 +55,7 @@ export default function ExploreScreen() {
   }, [query]);
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       {/* Header */}
@@ -203,7 +204,7 @@ export default function ExploreScreen() {
           </View>
         </TouchableOpacity>
       </Modal>
-    </View>
+    </ScreenBackground>
   );
 }
 
@@ -221,7 +222,7 @@ const emptyStyles = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   header: {
     paddingTop: 56,
     paddingHorizontal: Spacing.lg,

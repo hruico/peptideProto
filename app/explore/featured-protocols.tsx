@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { PROTOCOLS } from '../../data/protocols';
 import { PEPTIDES } from '../../data/peptides';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 const CARD_COLORS: string[] = [
   '#EF4444', '#F97316', '#3B82F6', '#8B5CF6', '#14B8A6', '#22C55E', '#6366F1',
@@ -25,9 +26,8 @@ export default function FeaturedProtocolsScreen() {
   const curatedProtocols = PROTOCOLS.filter(p => p.category === 'curated-combo');
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
-
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <ChevronLeft size={22} color={Colors.textPrimary} />
@@ -110,12 +110,12 @@ export default function FeaturedProtocolsScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
     paddingHorizontal: Spacing.lg, paddingTop: 52, paddingBottom: Spacing.lg,

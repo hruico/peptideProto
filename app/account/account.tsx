@@ -1,19 +1,50 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { router } from 'expo-router';
-import { X, User, ChevronRight } from 'lucide-react-native';
+import { X, User, ChevronRight, LogOut } from 'lucide-react-native';
 import { StatusBar } from 'expo-status-bar';
 import { format } from 'date-fns';
 import { useUserStore } from '../../store/useUserStore';
+import { useAuthStore, oauthUrls } from '../../store/useAuthStore';
+import { useOnboardingStore } from '../../store/useOnboardingStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import * as WebBrowser from 'expo-web-browser';
+import ScreenBackground from '../../components/ScreenBackground';
 
 export default function AccountScreen() {
-  const { user, isGuest, signIn } = useUserStore();
+  const { user } = useUserStore();
+  const { token, signOut } = useAuthStore();
+  const { resetOnboarding } = useOnboardingStore();
+  const isGuest = !token || (user?.isGuest ?? true);
   const memberYear = user?.createdAt
     ? format(new Date(user.createdAt), 'yyyy')
     : new Date().getFullYear().toString();
 
+  async function handleSignIn() {
+    await WebBrowser.openAuthSessionAsync(oauthUrls.google, 'peptideapp://');
+  }
+
+  function handleSignOut() {
+    Alert.alert(
+      'Sign Out',
+      'You will be signed out. Your data is saved and will be restored when you sign back in.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: () => {
+            signOut().then(() => {
+              resetOnboarding();
+              router.replace('/onboarding/splash');
+            });
+          },
+        },
+      ]
+    );
+  }
+
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.closeBtn} onPress={() => router.back()}>
@@ -39,7 +70,7 @@ export default function AccountScreen() {
               <Text style={styles.saveCardTitle}>Save Your Account</Text>
               <Text style={styles.saveCardSub}>Sync across devices</Text>
             </View>
-            <TouchableOpacity style={styles.signInBtn} onPress={() => signIn('Demo User')} activeOpacity={0.85}>
+            <TouchableOpacity style={styles.signInBtn} onPress={handleSignIn} activeOpacity={0.85}>
               <Text style={styles.signInText}>Sign In</Text>
             </TouchableOpacity>
           </View>
@@ -76,13 +107,25 @@ export default function AccountScreen() {
           <Text style={styles.menuRowText}>Set Up Public Profile</Text>
           {isGuest && <Text style={styles.profileHint}>Sign in first</Text>}
         </TouchableOpacity>
+
+        {/* Sign out — only shown for real (non-guest) accounts */}
+        {!isGuest && (
+          <TouchableOpacity
+            style={styles.signOutRow}
+            onPress={handleSignOut}
+            activeOpacity={0.8}
+          >
+            <LogOut size={18} color={Colors.accentRed} />
+            <Text style={styles.signOutText}>Sign Out</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   closeBtn: {
     position: 'absolute', top: 52, right: Spacing.lg, zIndex: 10,
     width: 34, height: 34, borderRadius: 17,
@@ -127,4 +170,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
   },
   profileHint: { color: Colors.textTertiary, fontSize: Typography.xs },
+  signOutRow: {
+    width: '100%', flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
+    padding: Spacing.lg, marginTop: Spacing.md,
+    backgroundColor: 'rgba(231,76,60,0.1)', borderRadius: Radii.xl,
+    borderWidth: 1, borderColor: 'rgba(231,76,60,0.25)',
+  },
+  signOutText: { color: Colors.accentRed, fontSize: Typography.base, fontWeight: FontWeight.semibold },
 });

@@ -3,9 +3,10 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { X } from 'lucide-react-native';
 import * as Linking from 'expo-linking';
+import ScreenBackground from '../../components/ScreenBackground';
 import VerifiedExpertsCard from '../../components/cards/VerifiedExpertsCard';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
-import { useUserStore } from '../../store/useUserStore';
+import { useAuthStore } from '../../store/useAuthStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 
 const DISCORD_URL = 'https://discord.gg/peptideapp';
@@ -43,27 +44,36 @@ const OPTIONS = [
 
 export default function GetStartedScreen() {
   const { setSelectedPath, completeOnboarding } = useOnboardingStore();
-  const { continueAsGuest } = useUserStore();
+  const { token, continueAsGuest } = useAuthStore();
+
+  async function ensureAuth() {
+    // Only create a guest account if there is no token at all
+    if (!token) {
+      await continueAsGuest();
+    }
+  }
 
   function handleOption(id: string, route: string | null) {
     setSelectedPath(id as any);
     if (route) {
       router.push(route as any);
     } else {
-      continueAsGuest();
-      completeOnboarding();
-      router.replace('/(tabs)');
+      ensureAuth().then(() => {
+        completeOnboarding();
+        router.replace('/(tabs)');
+      });
     }
   }
   return (
-    <View style={styles.container}>
+    <ScreenBackground bottomOpacity={0.92}>
       <StatusBar style="light" />
 
       {/* Close button */}
       <TouchableOpacity style={styles.closeBtn} onPress={() => {
-        continueAsGuest();
-        completeOnboarding();
-        router.replace('/(tabs)');
+        ensureAuth().then(() => {
+          completeOnboarding();
+          router.replace('/(tabs)');
+        });
       }}>
         <X size={18} color="rgba(255,255,255,0.6)" />
       </TouchableOpacity>
@@ -96,12 +106,11 @@ export default function GetStartedScreen() {
           onPressAskExpert={() => Linking.openURL(DISCORD_URL)}
         />
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   closeBtn: {
     position: 'absolute',
     top: 52,
@@ -140,11 +149,11 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '47%',
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: 'rgba(255,255,255,0.07)',
     borderRadius: Radii.xl,
     padding: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.surfaceBorder,
+    borderColor: 'rgba(255,255,255,0.14)',
     minHeight: 140,
   },
   cardNumber: {

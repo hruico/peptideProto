@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { X, Check } from 'lucide-react-native';
 import { useState, useMemo } from 'react';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 const ALL_METRICS = [
   { id: 'pain-level', name: 'Pain level', category: 'Healing', frequency: 'DAILY', description: 'Direct measure of healing. Daily tracking catches trends weeks before your training or movement does.', relevantFor: ['kpv', 'bpc-157', 'tb-500'] },
@@ -34,9 +35,8 @@ export default function SelectMetricsScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
-
       <View style={styles.navBar}>
         <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn}>
           <X size={20} color={Colors.textPrimary} />
@@ -106,7 +106,7 @@ export default function SelectMetricsScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 

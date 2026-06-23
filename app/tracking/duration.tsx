@@ -5,6 +5,7 @@ import { X } from 'lucide-react-native';
 import { useState } from 'react';
 import { addWeeks, format } from 'date-fns';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 const DURATION_OPTIONS = [4, 8, 12];
 
@@ -16,9 +17,8 @@ export default function TrackingDurationScreen() {
   const daysFromNow = selectedWeeks * 7;
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
-
       <View style={styles.navBar}>
         <TouchableOpacity onPress={() => router.back()} style={styles.closeBtn}>
           <X size={20} color={Colors.textPrimary} />
@@ -26,7 +26,6 @@ export default function TrackingDurationScreen() {
         <Text style={styles.navTitle}>How long are you tracking?</Text>
         <View style={{ width: 36 }} />
       </View>
-
       <View style={styles.content}>
         <Text style={styles.sub}>The longer the window, the clearer results will be</Text>
 
@@ -77,12 +76,12 @@ export default function TrackingDurationScreen() {
           <Text style={styles.continueBtnText}>Continue</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   navBar: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg, paddingTop: 52, paddingBottom: Spacing.md,

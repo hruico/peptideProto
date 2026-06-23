@@ -1,60 +1,64 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { apiFetch } from '../lib/apiClient';
 import type { UserProfile } from '../types';
 
-interface UserState {
+interface ServerUser {
+  _id: string;
+  displayName?: string;
+  createdAt: string;
   isGuest: boolean;
-  user: UserProfile | null;
-
-  // Actions
-  continueAsGuest: () => void;
-  signIn: (displayName?: string) => void;
-  signOut: () => void;
 }
 
-function generateId(): string {
-  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+interface UserState {
+  user: UserProfile | null;
+  isLoading: boolean;
+
+  fetchProfile: () => Promise<void>;
+  updateDisplayName: (name: string) => Promise<void>;
+  clearProfile: () => void;
 }
 
 export const useUserStore = create<UserState>()(
   persist(
-    (set, get) => ({
-      isGuest: true,
+    (set) => ({
       user: null,
+      isLoading: false,
 
-      continueAsGuest: () => {
-        // Only create a guest profile if one doesn't exist yet
-        if (!get().user) {
-          set({
-            isGuest: true,
-            user: {
-              id: generateId(),
-              createdAt: new Date().toISOString(),
-              isGuest: true,
-            },
-          });
+      fetchProfile: async () => {
+        set({ isLoading: true });
+        try {
+          const raw = await apiFetch<ServerUser>('/user/me');
+          const user: UserProfile = {
+            id: raw._id,
+            displayName: raw.displayName,
+            createdAt: raw.createdAt,
+            isGuest: raw.isGuest,
+          };
+          set({ user, isLoading: false });
+        } catch (err) {
+          console.warn('fetchProfile failed:', err);
+          set({ isLoading: false });
         }
       },
 
-      signIn: (displayName) =>
+      updateDisplayName: async (displayName) => {
         set((state) => ({
-          isGuest: false,
-          user: state.user
-            ? { ...state.user, displayName, isGuest: false }
-            : {
-                id: generateId(),
-                displayName,
-                createdAt: new Date().toISOString(),
-                isGuest: false,
-              },
-        })),
+          user: state.user ? { ...state.user, displayName } : null,
+        }));
+        try {
+          const raw = await apiFetch<ServerUser>('/user/me', {
+            method: 'PATCH',
+            body: { displayName },
+          });
+          set({ user: { id: raw._id, displayName: raw.displayName, createdAt: raw.createdAt, isGuest: raw.isGuest } });
+        } catch (err) {
+          console.warn('updateDisplayName sync failed:', err);
+        }
+      },
 
-      signOut: () =>
-        set({
-          isGuest: true,
-          user: null,
-        }),
+      clearProfile: () => set({ user: null }),
     }),
     {
       name: 'user-storage',

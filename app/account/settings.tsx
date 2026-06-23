@@ -3,12 +3,14 @@ import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, ChevronRight, Bell, MessageSquare, HeartPulse, HelpCircle, FileText, RotateCcw } from 'lucide-react-native';
 import { useState } from 'react';
+import { useAuthStore } from '../../store/useAuthStore';
 import { useUserStore } from '../../store/useUserStore';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
 import { useScheduleStore } from '../../store/useScheduleStore';
 import { useProtocolStore } from '../../store/useProtocolStore';
 import { useTrackingStore } from '../../store/useTrackingStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 export default function SettingsScreen() {
   const [notifications, setNotifications] = useState(true);
@@ -17,7 +19,8 @@ export default function SettingsScreen() {
   const [confirmVisible, setConfirmVisible] = useState(false);
 
   const { resetOnboarding } = useOnboardingStore();
-  const { signOut } = useUserStore();
+  const { signOut } = useAuthStore();
+  const { clearProfile } = useUserStore();
   const { clearAll } = useScheduleStore();
   const { clearActivityLog, removeProtocol, myProtocols } = useProtocolStore();
   const { sessions, removeSession } = useTrackingStore();
@@ -27,10 +30,8 @@ export default function SettingsScreen() {
     clearActivityLog();
     [...myProtocols].forEach(p => removeProtocol(p.id));
     [...sessions].forEach(s => removeSession(s.id));
+    clearProfile();
     signOut();
-    // resetOnboarding sets hasCompletedOnboarding = false
-    // _layout.tsx useEffect watches that flag and redirects to splash automatically
-    // No need to call router.replace here — avoids double-navigation error
     resetOnboarding();
   }
 
@@ -52,7 +53,7 @@ export default function SettingsScreen() {
 
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <View style={styles.header}>
@@ -173,12 +174,12 @@ export default function SettingsScreen() {
           )}
         </View>
       </ScrollView>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: Spacing.lg, paddingTop: 52, paddingBottom: Spacing.md,

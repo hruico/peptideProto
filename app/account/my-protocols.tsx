@@ -6,12 +6,13 @@ import { differenceInDays } from 'date-fns';
 import { useProtocolStore } from '../../store/useProtocolStore';
 import { getPeptideById } from '../../data/peptides';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+import ScreenBackground from '../../components/ScreenBackground';
 
 export default function MyProtocolsScreen() {
   const { myProtocols, removeProtocol } = useProtocolStore();
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <View style={styles.header}>
@@ -85,12 +86,12 @@ export default function MyProtocolsScreen() {
       >
         <Plus size={24} color="#fff" />
       </TouchableOpacity>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
+  container: { flex: 1 },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingTop: 56, paddingHorizontal: Spacing.lg, paddingBottom: Spacing.md,

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft } from 'lucide-react-native';
+import ScreenBackground from '../../components/ScreenBackground';
 import { useOnboardingStore } from '../../store/useOnboardingStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
 import type { AgeRange } from '../../types';
@@ -27,7 +28,7 @@ export default function AgeScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <StatusBar style="light" />
 
       <TouchableOpacity style={styles.back} onPress={() => router.back()}>
@@ -53,15 +54,11 @@ export default function AgeScreen() {
           ))}
         </View>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.base,
-  },
   back: {
     position: 'absolute',
     top: 52,

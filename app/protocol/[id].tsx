@@ -7,10 +7,28 @@ import { StatusBar } from 'expo-status-bar';
 import { ChevronLeft, X, Users, Clock, Zap, DollarSign, ChevronRight, ChevronDown } from 'lucide-react-native';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import ScreenBackground from '../../components/ScreenBackground';
 import { getProtocolById } from '../../data/protocols';
 import { getPeptideById } from '../../data/peptides';
 import { useProtocolStore } from '../../store/useProtocolStore';
 import { Colors, Radii, Typography, FontWeight, Spacing } from '../../constants/theme';
+
+// Deterministic hero image per protocol
+const CARD_IMAGES = [
+  require('../../assets/images/random1.jpeg'),
+  require('../../assets/images/random2.jpg'),
+  require('../../assets/images/random3.jpg'),
+  require('../../assets/images/random4.jpg'),
+];
+const PROTOCOL_IMAGE_INDEX: Record<string, number> = {
+  'injury-recovery-stack': 0,
+  'gh-optimizer': 1,
+  'cognitive-edge': 2,
+  'longevity-protocol': 3,
+  'body-recomp': 0,
+  'elite-recovery': 1,
+  'gut-reset': 2,
+};
 
 export default function ProtocolDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -18,13 +36,15 @@ export default function ProtocolDetailScreen() {
   const { startProtocol } = useProtocolStore();
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
+  const imgIndex = PROTOCOL_IMAGE_INDEX[id ?? ''] ?? (id ? id.charCodeAt(0) % 4 : 0);
+
   if (!protocol) return (
-    <View style={styles.container}>
+    <ScreenBackground>
       <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
         <ChevronLeft size={22} color={Colors.textPrimary} />
       </TouchableOpacity>
       <Text style={styles.notFound}>Protocol not found</Text>
-    </View>
+    </ScreenBackground>
   );
 
   const difficulty = (protocol as any).difficulty ?? 'Intermediate';
@@ -44,12 +64,21 @@ export default function ProtocolDetailScreen() {
   ];
 
   return (
-    <View style={styles.container}>
+    <ScreenBackground bottomOpacity={0.97}>
       <StatusBar style="light" />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {/* Hero */}
-        <LinearGradient colors={['#1A1A2E', '#16213E', '#0F3460']} style={styles.hero}>
+        {/* Hero — random image with gradient overlay */}
+        <ImageBackground
+          source={CARD_IMAGES[imgIndex]}
+          style={styles.hero}
+          imageStyle={styles.heroImage}
+          resizeMode="cover"
+        >
+          <LinearGradient
+            colors={['rgba(10,10,25,0.35)', 'rgba(10,10,25,0.80)']}
+            style={StyleSheet.absoluteFill}
+          />
           <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
             <ChevronLeft size={22} color="#fff" />
           </TouchableOpacity>
@@ -73,7 +102,7 @@ export default function ProtocolDetailScreen() {
               </View>
             </View>
           </View>
-        </LinearGradient>
+        </ImageBackground>
 
         {/* At a Glance */}
         <View style={styles.section}>
@@ -186,16 +215,16 @@ export default function ProtocolDetailScreen() {
       <View style={styles.stickyFooter}>
         <TouchableOpacity
           style={styles.startBtn}
-          onPress={() => {
-            startProtocol(protocol);
-            router.back();
+          onPress={async () => {
+            await startProtocol(protocol);
+            router.replace({ pathname: '/protocol/started', params: { id: protocol.id } });
           }}
           activeOpacity={0.85}
         >
           <Text style={styles.startBtnText}>Start Protocol</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScreenBackground>
   );
 }
 
@@ -224,19 +253,27 @@ function getCategoryColor(cat: string): string {
 
 const statStyles = StyleSheet.create({
   tile: {
-    flex: 1, minWidth: '45%', backgroundColor: Colors.surface,
+    flex: 1, minWidth: '45%',
+    backgroundColor: 'rgba(255,255,255,0.07)',
     borderRadius: Radii.lg, padding: Spacing.md, gap: 4,
     alignItems: 'flex-start',
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
   },
   label: { fontSize: Typography.xs, color: Colors.textTertiary, fontWeight: FontWeight.medium },
   value: { fontSize: Typography.base, color: Colors.textPrimary, fontWeight: FontWeight.bold },
 });
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.base },
   notFound: { textAlign: 'center', marginTop: 100, color: Colors.textSecondary },
   scroll: { paddingBottom: 40 },
-  hero: { paddingTop: 56, paddingBottom: Spacing.xl, paddingHorizontal: Spacing.lg },
+  hero: {
+    paddingTop: 56,
+    paddingBottom: Spacing.xl,
+    paddingHorizontal: Spacing.lg,
+    minHeight: 240,
+    justifyContent: 'flex-end',
+  },
+  heroImage: { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
   backBtn: {
     position: 'absolute', top: 52, left: Spacing.lg, zIndex: 10,
     width: 36, height: 36, borderRadius: 18,
@@ -271,8 +308,8 @@ const styles = StyleSheet.create({
   bulletText: { flex: 1, fontSize: Typography.sm, color: Colors.textPrimary, lineHeight: 20 },
   peptideRow: {
     flexDirection: 'row', alignItems: 'center', gap: Spacing.md,
-    backgroundColor: Colors.surface, borderRadius: Radii.lg, padding: Spacing.md,
-    marginBottom: Spacing.sm, borderWidth: 1, borderColor: Colors.surfaceBorder,
+    backgroundColor: 'rgba(255,255,255,0.07)', borderRadius: Radii.lg, padding: Spacing.md,
+    marginBottom: Spacing.sm, borderWidth: 1, borderColor: 'rgba(255,255,255,0.12)',
   },
   peptideAvatar: {
     width: 40, height: 40, borderRadius: 20,
@@ -285,7 +322,7 @@ const styles = StyleSheet.create({
   peptideDesc: { fontSize: Typography.xs, color: Colors.textSecondary, marginTop: 2 },
   scheduleRow: {
     flexDirection: 'row', gap: Spacing.md, alignItems: 'center',
-    paddingVertical: Spacing.sm, borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
+    paddingVertical: Spacing.sm, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
   },
   scheduleAvatar: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   scheduleInfo: { flex: 1 },
@@ -293,7 +330,7 @@ const styles = StyleSheet.create({
   scheduleDose: { fontSize: Typography.xs, color: Colors.textSecondary, marginTop: 2 },
   scheduleTiming: { fontSize: Typography.xs, color: Colors.textTertiary },
   cautionCard: {
-    backgroundColor: 'rgba(243,156,18,0.12)',
+    backgroundColor: 'rgba(243,156,18,0.10)',
     borderRadius: Radii.lg, padding: Spacing.md,
     borderWidth: 1, borderColor: 'rgba(243,156,18,0.3)', gap: Spacing.sm,
   },
@@ -301,15 +338,16 @@ const styles = StyleSheet.create({
   cautionBullet: { fontSize: Typography.sm, color: '#F39C12' },
   cautionText: { flex: 1, fontSize: Typography.sm, color: Colors.textPrimary, lineHeight: 20 },
   faqRow: {
-    paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: Colors.surfaceBorder,
+    paddingVertical: Spacing.md, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.08)',
     flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: 8,
   },
   faqQuestion: { flex: 1, fontSize: Typography.base, color: Colors.textPrimary, fontWeight: FontWeight.medium },
   faqAnswer: { width: '100%', fontSize: Typography.sm, color: Colors.textSecondary, marginTop: 8, lineHeight: 20 },
   stickyFooter: {
     position: 'absolute', bottom: 0, left: 0, right: 0,
-    padding: Spacing.lg, paddingBottom: 36, backgroundColor: Colors.base,
-    borderTopWidth: 1, borderTopColor: Colors.surfaceBorder,
+    padding: Spacing.lg, paddingBottom: 36,
+    backgroundColor: 'rgba(18,19,42,0.88)',
+    borderTopWidth: 1, borderTopColor: 'rgba(255,255,255,0.1)',
   },
   startBtn: {
     backgroundColor: Colors.primaryOrange, borderRadius: 32, paddingVertical: 18, alignItems: 'center',
